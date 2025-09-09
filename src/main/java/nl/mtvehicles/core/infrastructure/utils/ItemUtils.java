@@ -12,6 +12,7 @@ import org.apache.commons.lang.RandomStringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -63,10 +64,13 @@ public class ItemUtils {
         if (!material.isItem()) return null;
         ItemStack vehicle = (new ItemFactory(material))
                 .setName(TextUtils.colorize("&6" + name))
-                .setDurability(durability)
+                //.setDurability(durability)
                 .setUnbreakable(true)
                 .setLore("&a")
                 .toItemStack();
+        ItemMeta meta = vehicle.getItemMeta();
+        meta.setCustomModelData(durability);
+        vehicle.setItemMeta(meta);
         return vehicle;
     }
 
@@ -77,13 +81,16 @@ public class ItemUtils {
         if (!material.isItem()) return null;
         String licensePlate = generateLicencePlate();
         ItemStack vehicle = (new ItemFactory(material))
-                .setDurability(durability)
+                //.setDurability(durability)
                 .setName(TextUtils.colorize("&6" + name))
                 .setNBT("mtvehicles.kenteken", licensePlate)
                 .setNBT("mtvehicles.naam", name)
                 .setLore("&a", "&a" + licensePlate, "&a")
                 .setUnbreakable(true)
                 .toItemStack();
+        ItemMeta meta = vehicle.getItemMeta();
+        meta.setCustomModelData(durability);
+        vehicle.setItemMeta(meta);
         return vehicle;
     }
 
@@ -97,7 +104,7 @@ public class ItemUtils {
         }
         String licensePlate = generateLicencePlate();
         ItemStack vehicle = (new ItemFactory(material))
-                .setDurability(durability)
+                //.setDurability(durability)
                 .setName(TextUtils.colorize("&6" + name))
                 .setNBT("mtvehicles.kenteken", licensePlate)
                 .setNBT("mtvehicles.naam", name)
@@ -105,6 +112,9 @@ public class ItemUtils {
                 .setLore("&a", "&a" + licensePlate, "&a")
                 .setUnbreakable(true)
                 .toItemStack();
+        ItemMeta meta = vehicle.getItemMeta();
+        meta.setCustomModelData(durability);
+        vehicle.setItemMeta(meta);
         return vehicle;
     }
 
@@ -115,7 +125,7 @@ public class ItemUtils {
         if (!material.isItem()) return null;
         if (glowing == null) glowing = false;
         ItemStack vehicle = (new ItemFactory(material))
-                .setDurability(durability)
+               //.setDurability(durability)
                 .setName(TextUtils.colorize("&6" + name))
                 .setGlowing(glowing)
                 .setNBT("mtvehicles.kenteken", licensePlate)
@@ -123,6 +133,9 @@ public class ItemUtils {
                 .setLore("&a", "&a" + licensePlate, "&a")
                 .setUnbreakable(true)
                 .toItemStack();
+        ItemMeta meta = vehicle.getItemMeta();
+        meta.setCustomModelData(durability);
+        vehicle.setItemMeta(meta);
         return vehicle;
     }
 
@@ -173,7 +186,7 @@ public class ItemUtils {
         }
         if (glowing == null) glowing = false;
         ItemStack vehicle = (new ItemFactory(material))
-                .setDurability(durability)
+                //.setDurability(durability)
                 .setName(TextUtils.colorize("&6" + name))
                 .setGlowing(glowing)
                 .setNBT("mtvehicles.kenteken", licensePlate)
@@ -182,6 +195,9 @@ public class ItemUtils {
                 .setLore("&a", "&a" + licensePlate, "&a")
                 .setUnbreakable(true)
                 .toItemStack();
+        ItemMeta meta = vehicle.getItemMeta();
+        meta.setCustomModelData(durability);
+        vehicle.setItemMeta(meta);
         return vehicle;
     }
 
@@ -203,7 +219,9 @@ public class ItemUtils {
         } catch (Exception e1){
             try {
                 item = new ItemStack(getMaterial(materialLegacyName), amount);
-                item.setDurability(legacyData);
+                ItemMeta meta = item.getItemMeta();
+                meta.setCustomModelData(0);
+                item.setItemMeta(meta);
             } catch (Exception e2){
                 Main.logSevere("An error occurred - could not get item neither from " + materialName + " nor from " + materialLegacyName + ". This is most likely a plugin issue, contact us at discord.gg/vehicle!");
                 return null;
@@ -265,10 +283,13 @@ public class ItemUtils {
     public static ItemStack getMenuItem(@NotNull Material material, int amount, int durability, boolean unbreakable, String name, List<String> lores){
         ItemStack item = (new ItemFactory(material, amount))
                 .setName(name)
-                .setDurability(durability)
+                //.setDurability(durability)
                 .setUnbreakable(unbreakable)
                 .setLore(lores)
                 .toItemStack();
+        ItemMeta meta = item.getItemMeta();
+        meta.setCustomModelData(durability);
+        item.setItemMeta(meta);
         return item;
     }
 
@@ -358,11 +379,15 @@ public class ItemUtils {
     public static ItemStack getMenuCustomItem(@NotNull Material material, String name, int durability, List<String> lore){
         if (!material.isItem()) return null;
         ItemStack vehicle = (new ItemFactory(material))
-                .setDurability(durability)
+                //.setDurability(durability)
                 .setName(name)
                 .setLore(lore)
                 .setUnbreakable(true)
                 .toItemStack();
+        ItemMeta meta = vehicle.getItemMeta();
+        meta.setCustomModelData(durability);
+        vehicle.setItemMeta(meta);
+
         return vehicle;
     }
 
@@ -384,12 +409,15 @@ public class ItemUtils {
             return getMenuCustomItem(material, name, durability, lore);
         }
         ItemStack vehicle = (new ItemFactory(material))
-                .setDurability(durability)
+                //.setDurability(durability)
                 .setName(name)
                 .setNBT(nbtKey, nbtValue.toString())
                 .setLore(lore)
                 .setUnbreakable(true)
                 .toItemStack();
+        ItemMeta meta = vehicle.getItemMeta();
+        meta.setCustomModelData(durability);
+        vehicle.setItemMeta(meta);
         return vehicle;
     }
 

@@ -39,7 +39,10 @@ public class ItemFactory {
 
     public ItemFactory(Material material, int amount, int durability) {
         this.item = new ItemStack(material, amount);
-        this.setDurability(durability);
+        ItemMeta im = this.item.getItemMeta();
+        im.setCustomModelData(durability);
+        item.setItemMeta(im);
+        //this.setDurability(durability);
     }
 
     public ItemFactory clone() {
@@ -51,11 +54,14 @@ public class ItemFactory {
         if (getServerVersion().is1_12()) this.item.setDurability((short) durability);
         else {
             ItemMeta im = this.item.getItemMeta();
-            ((org.bukkit.inventory.meta.Damageable) im).setDamage(durability);
+           // ((org.bukkit.inventory.meta.Damageable) im).setDamage(durability);
+            im.setCustomModelData(durability);
             this.item.setItemMeta(im);
         }
         return this;
     }
+
+
 
     public ItemFactory setType(Material material) {
         this.item.setType(material);
