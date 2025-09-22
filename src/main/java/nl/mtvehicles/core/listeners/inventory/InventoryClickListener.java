@@ -186,7 +186,7 @@ public class InventoryClickListener extends MTVListener {
                     nbt.getString("mtvehicles.naam"),
                     VehicleType.valueOf((String) vehicles.get(intSave.get(player.getUniqueId())).get("vehicleType")),
                     false,
-                    vehicleMenu.get(player.getUniqueId()).getDurability(),
+                    vehicleMenu.get(player.getUniqueId()).getItemMeta().getCustomModelData(),
                     vehicleMenu.get(player.getUniqueId()).getType().toString(),
                     false,
                     (boolean) vehicles.get(intSave.get(player.getUniqueId())).get("hornEnabled"),
