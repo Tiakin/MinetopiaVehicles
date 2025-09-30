@@ -13,23 +13,23 @@ public enum ServerVersion {
     /**
      * 1.12-1.12.2
      */
-    v1_12_R1(PacketHandler::movement_1_12),
+    v1_12_R1(PacketHandler::movement_1_12_R1),
     /**
      * 1.13.1-1.13.2
      */
-    v1_13_R2(PacketHandler::movement_1_13),
+    v1_13_R2(PacketHandler::movement_1_13_R2),
     /**
      * 1.15-1.15.2
      */
-    v1_15_R1(PacketHandler::movement_1_15),
+    v1_15_R1(PacketHandler::movement_1_15_R1),
     /**
      * 1.16.4-1.16.5
      */
-    v1_16_R3(PacketHandler::movement_1_16),
+    v1_16_R3(PacketHandler::movement_1_16_R3),
     /**
      * 1.17-1.17.1
      */
-    v1_17_R1(PacketHandler::movement_1_17),
+    v1_17_R1(PacketHandler::movement_1_17_R1),
     /**
      * 1.18-1.18.1
      */
@@ -42,7 +42,7 @@ public enum ServerVersion {
      * 1.19-1.19.2
      * @since 2.4.3
      */
-    v1_19_R1(PacketHandler::movement_1_19),
+    v1_19_R1(PacketHandler::movement_1_19_R1),
     /**
      * 1.19.3
      * @since 2.5.0

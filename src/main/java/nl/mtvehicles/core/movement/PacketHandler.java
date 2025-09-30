@@ -552,7 +552,7 @@ public class PacketHandler {
      * Packet handler for vehicle steering in 1.19-1.19.2
      * @param player Player whose steering is being regarded
      */
-    public static void movement_1_19(Player player) {
+    public static void movement_1_19_R1(Player player) {
         ChannelDuplexHandler channelDuplexHandler = new ChannelDuplexHandler() {
             public void channelRead(ChannelHandlerContext channelHandlerContext, Object packet) throws Exception {
                 super.channelRead(channelHandlerContext, packet);
@@ -582,7 +582,7 @@ public class PacketHandler {
             }
             if (!channel.pipeline().names().contains(player.getName())) return;
             channel.pipeline().remove(player.getName());
-            movement_1_19(player);
+            movement_1_19_R1(player);
         } catch (IllegalAccessException | NoSuchFieldException e) {
             unexpectedException(e);
         }
@@ -663,7 +663,7 @@ public class PacketHandler {
      * Packet handler for vehicle steering in 1.17 and 1.17.1
      * @param player Player whose steering is being regarded
      */
-    public static void movement_1_17(Player player) {
+    public static void movement_1_17_R1(Player player) {
         ChannelDuplexHandler channelDuplexHandler = new ChannelDuplexHandler() {
             public void channelRead(ChannelHandlerContext channelHandlerContext, Object packet) throws Exception {
                 super.channelRead(channelHandlerContext, packet);
@@ -686,7 +686,7 @@ public class PacketHandler {
             }
             if (!channel.pipeline().names().contains(player.getName())) return;
             channel.pipeline().remove(player.getName());
-            movement_1_17(player);
+            movement_1_17_R1(player);
         } catch (NoSuchElementException e) {
             //It isn't good practice to ignore exceptions, but I'll keep it like this for now :)
         }
@@ -696,7 +696,7 @@ public class PacketHandler {
      * Packet handler for vehicle steering in 1.16.5 and 1.16.4 (NMS versions 1_16_R2 and 1_16_R1 are not supported)
      * @param player Player whose steering is being regarded
      */
-    public static void movement_1_16(Player player) {
+    public static void movement_1_16_R3(Player player) {
         ChannelDuplexHandler channelDuplexHandler = new ChannelDuplexHandler() {
             @Override
             public void channelRead(ChannelHandlerContext channelHandlerContext, Object packet) throws Exception {
@@ -720,7 +720,7 @@ public class PacketHandler {
             }
             if (!channel.pipeline().names().contains(player.getName())) return;
             channel.pipeline().remove(player.getName());
-            movement_1_16(player);
+            movement_1_16_R3(player);
         } catch (NoSuchElementException e) {
             //It isn't good practice to ignore exceptions, but I'll keep it like this for now :)
         }
@@ -730,7 +730,7 @@ public class PacketHandler {
      * Packet handler for vehicle steering in versions 1.15-1.15.2
      * @param player Player whose steering is being regarded
      */
-    public static void movement_1_15(Player player) {
+    public static void movement_1_15_R1(Player player) {
         ChannelDuplexHandler channelDuplexHandler = new ChannelDuplexHandler() {
             @Override
             public void channelRead(ChannelHandlerContext channelHandlerContext, Object packet) throws Exception {
@@ -754,7 +754,7 @@ public class PacketHandler {
             }
             if (!channel.pipeline().names().contains(player.getName())) return;
             channel.pipeline().remove(player.getName());
-            movement_1_15(player);
+            movement_1_15_R1(player);
         } catch (NoSuchElementException e) {
             //It isn't good practice to ignore exceptions, but I'll keep it like this for now :)
         }
@@ -764,7 +764,7 @@ public class PacketHandler {
      * Packet handler for vehicle steering in 1.13.2 and 1.13.1 (NMS version 1_13_R1 is not supported)
      * @param player Player whose steering is being regarded
      */
-    public static void movement_1_13(Player player) {
+    public static void movement_1_13_R2(Player player) {
         ChannelDuplexHandler channelDuplexHandler = new ChannelDuplexHandler() {
             @Override
             public void channelRead(ChannelHandlerContext channelHandlerContext, Object packet) throws Exception {
@@ -788,7 +788,7 @@ public class PacketHandler {
             }
             if (!channel.pipeline().names().contains(player.getName())) return;
             channel.pipeline().remove(player.getName());
-            movement_1_13(player);
+            movement_1_13_R2(player);
         } catch (NoSuchElementException e) {
             //It isn't good practice to ignore exceptions, but I'll keep it like this for now :)
         }
@@ -798,7 +798,7 @@ public class PacketHandler {
      * Packet handler for vehicle steering in versions 1.12-1.12.2
      * @param player Player whose steering is being regarded
      */
-    public static void movement_1_12(Player player) {
+    public static void movement_1_12_R1(Player player) {
         ChannelDuplexHandler channelDuplexHandler = new ChannelDuplexHandler() {
             @Override
             public void channelRead(ChannelHandlerContext channelHandlerContext, Object packet) throws Exception {
@@ -822,7 +822,7 @@ public class PacketHandler {
             }
             if (!channel.pipeline().names().contains(player.getName())) return;
             channel.pipeline().remove(player.getName());
-            movement_1_16(player);
+            movement_1_16_R3(player);
         } catch (NoSuchElementException e) {
             //It isn't good practice to ignore exceptions, but I'll keep it like this for now :)
         }
