@@ -82,28 +82,28 @@ public class VersionModule {
             case "1.12.1":
             case "1.12.2":
             case "v1_12_R1":
-                returns = ServerVersion.v1_12;
+                returns = ServerVersion.v1_12_R1;
                 break;
             case "1.13.1":
             case "1.13.2":
             case "v1_13_R2":
-                returns = ServerVersion.v1_13;
+                returns = ServerVersion.v1_13_R2;
                 break;
             case "1.15":
             case "1.15.1":
             case "1.15.2":
             case "v1_15_R1":
-                returns = ServerVersion.v1_15;
+                returns = ServerVersion.v1_15_R1;
                 break;
             case "1.16.4":
             case "1.16.5":
             case "v1_16_R3":
-                returns = ServerVersion.v1_16;
+                returns = ServerVersion.v1_16_R3;
                 break;
             case "1.17":
             case "1.17.1":
             case "v1_17_R1":
-                returns = ServerVersion.v1_17;
+                returns = ServerVersion.v1_17_R1;
                 break;
             case "1.18":
             case "1.18.1":
@@ -163,8 +163,8 @@ public class VersionModule {
                 break;
             case "1.21.5":
             case "v1_21_R4":
-                    returns = ServerVersion.v1_21_R4;
-                    break;
+                returns = ServerVersion.v1_21_R4;
+                break;
             case "1.21.6":
             case "1.21.7":
             case "1.21.8":

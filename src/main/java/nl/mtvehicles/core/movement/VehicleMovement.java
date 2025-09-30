@@ -167,7 +167,7 @@ public class VehicleMovement {
             return;
         }
 
-        if ((boolean) ConfigModule.defaultConfig.get(DefaultConfig.Option.HEADLIGHTS_ENABLED) && getServerVersion().isNewerOrEqualTo(ServerVersion.v1_17)){headlightsEnabled = true;}
+        if ((boolean) ConfigModule.defaultConfig.get(DefaultConfig.Option.HEADLIGHTS_ENABLED) && getServerVersion().isNewerOrEqualTo(ServerVersion.v1_17_R1)){headlightsEnabled = true;}
 
 
         schedulerRun(() -> {
@@ -695,14 +695,14 @@ public class VehicleMovement {
      */
     @VersionSpecific
     protected void teleportSeat(ArmorStand seat, Location loc){
-        if (getServerVersion().is1_12()) teleportSeat(((org.bukkit.craftbukkit.v1_12_R1.entity.CraftEntity) seat).getHandle(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
-        else if (getServerVersion().is1_13()) teleportSeat(((org.bukkit.craftbukkit.v1_13_R2.entity.CraftEntity) seat).getHandle(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
-        else if (getServerVersion().is1_15()) teleportSeat(((org.bukkit.craftbukkit.v1_15_R1.entity.CraftEntity) seat).getHandle(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
-        else if (getServerVersion().is1_16()) teleportSeat(((org.bukkit.craftbukkit.v1_16_R3.entity.CraftEntity) seat).getHandle(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
-        else if (getServerVersion().is1_17()) teleportSeat(((org.bukkit.craftbukkit.v1_17_R1.entity.CraftEntity) seat).getHandle(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
+        if (getServerVersion().is1_12_R1()) teleportSeat(((org.bukkit.craftbukkit.v1_12_R1.entity.CraftEntity) seat).getHandle(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
+        else if (getServerVersion().is1_13_R2()) teleportSeat(((org.bukkit.craftbukkit.v1_13_R2.entity.CraftEntity) seat).getHandle(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
+        else if (getServerVersion().is1_15_R1()) teleportSeat(((org.bukkit.craftbukkit.v1_15_R1.entity.CraftEntity) seat).getHandle(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
+        else if (getServerVersion().is1_16_R3()) teleportSeat(((org.bukkit.craftbukkit.v1_16_R3.entity.CraftEntity) seat).getHandle(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
+        else if (getServerVersion().is1_17_R1()) teleportSeat(((org.bukkit.craftbukkit.v1_17_R1.entity.CraftEntity) seat).getHandle(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
         else if (getServerVersion().is1_18_R1()) teleportSeat(((org.bukkit.craftbukkit.v1_18_R1.entity.CraftEntity) seat).getHandle(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
         else if (getServerVersion().is1_18_R2()) teleportSeat(((org.bukkit.craftbukkit.v1_18_R2.entity.CraftEntity) seat).getHandle(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
-        else if (getServerVersion().is1_19()) teleportSeat(((org.bukkit.craftbukkit.v1_19_R1.entity.CraftEntity) seat).getHandle(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
+        else if (getServerVersion().is1_19_R1()) teleportSeat(((org.bukkit.craftbukkit.v1_19_R1.entity.CraftEntity) seat).getHandle(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
         else if (getServerVersion().is1_19_R2()) teleportSeat(((org.bukkit.craftbukkit.v1_19_R2.entity.CraftEntity) seat).getHandle(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
         else if (getServerVersion().is1_19_R3()) teleportSeat(((org.bukkit.craftbukkit.v1_19_R3.entity.CraftEntity) seat).getHandle(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
         else if (getServerVersion().is1_20_R1()) teleportSeat(((org.bukkit.craftbukkit.v1_20_R1.entity.CraftEntity) seat).getHandle(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
@@ -1034,7 +1034,7 @@ public class VehicleMovement {
         stand.getWorld().spawnParticle(Particle.EXPLOSION_LARGE, loc, 2);
         stand.getWorld().spawnParticle(Particle.EXPLOSION_NORMAL, loc, 2);
         stand.getWorld().spawnParticle(Particle.FIREWORKS_SPARK, loc, 5);
-        if (!getServerVersion().isOlderOrEqualTo(ServerVersion.v1_13))
+        if (!getServerVersion().isOlderOrEqualTo(ServerVersion.v1_13_R2))
             stand.getWorld().spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, loc, 5);
     }
 

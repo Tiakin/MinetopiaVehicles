@@ -291,7 +291,7 @@ public class ItemUtils {
      */
     @VersionSpecific
     public static Material getStainedGlassPane(){
-        if (getServerVersion().is1_12()) return Material.matchMaterial("STAINED_GLASS_PANE");
+        if (getServerVersion().is1_12_R1()) return Material.matchMaterial("STAINED_GLASS_PANE");
         else return Material.matchMaterial("WHITE_STAINED_GLASS_PANE");
     }
 

@@ -11,23 +11,23 @@ public enum ServerVersion {
     /**
      * 1.12-1.12.2
      */
-    v1_12,
+    v1_12_R1,
     /**
      * 1.13.1-1.13.2
      */
-    v1_13,
+    v1_13_R2,
     /**
      * 1.15-1.15.2
      */
-    v1_15,
+    v1_15_R1,
     /**
      * 1.16.4-1.16.5
      */
-    v1_16,
+    v1_16_R3,
     /**
      * 1.17-1.17.1
      */
-    v1_17,
+    v1_17_R1,
     /**
      * 1.18-1.18.1
      */
@@ -98,41 +98,23 @@ public enum ServerVersion {
      */
     v1_21_R5;
 
-    public boolean is1_12(){
-        return this.equals(v1_12);
-    }
+    public boolean is1_12_R1(){return this.equals(v1_12_R1);}
 
-    public boolean is1_13(){
-        return this.equals(v1_13);
-    }
+    public boolean is1_13_R2(){return this.equals(v1_13_R2);}
 
-    public boolean is1_15(){
-        return this.equals(v1_15);
-    }
+    public boolean is1_15_R1(){return this.equals(v1_15_R1);}
 
-    public boolean is1_16(){
-        return this.equals(v1_16);
-    }
+    public boolean is1_16_R3(){return this.equals(v1_16_R3);}
 
-    public boolean is1_17(){
-        return this.equals(v1_17);
-    }
+    public boolean is1_17_R1(){return this.equals(v1_17_R1);}
 
-    public boolean is1_18_R1(){
-        return this.equals(v1_18_R1);
-    }
+    public boolean is1_18_R1(){return this.equals(v1_18_R1);}
 
-    public boolean is1_18_R2(){
-        return this.equals(v1_18_R2);
-    }
+    public boolean is1_18_R2(){return this.equals(v1_18_R2);}
 
-    public boolean is1_19(){
-        return this.equals(v1_19_R1);
-    }
+    public boolean is1_19_R1(){return this.equals(v1_19_R1);}
 
-    public boolean is1_19_R2(){
-        return this.equals(v1_19_R2);
-    }
+    public boolean is1_19_R2(){return this.equals(v1_19_R2);}
 
     public boolean is1_19_R3(){return this.equals(v1_19_R3);}
 
@@ -140,9 +122,7 @@ public enum ServerVersion {
 
     public boolean is1_20_R2() {return this.equals(v1_20_R2);}
 
-    public boolean is1_20_R3() {
-        return this.equals(v1_20_R3);
-    }
+    public boolean is1_20_R3() {return this.equals(v1_20_R3);}
 
     public boolean is1_20_R4(){return this.equals(v1_20_R4);}
 

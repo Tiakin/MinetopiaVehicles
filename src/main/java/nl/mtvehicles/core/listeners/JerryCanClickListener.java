@@ -109,7 +109,7 @@ public class JerryCanClickListener extends MTVListener {
     private void playJerryCanSound() {
         if (!ConfigModule.defaultConfig.jerryCanPlaySound()) return;
 
-        String soundName = VersionModule.getServerVersion().is1_12() ? "BLOCK_NOTE_PLING" : "BLOCK_NOTE_BLOCK_PLING";
+        String soundName = VersionModule.getServerVersion().is1_12_R1() ? "BLOCK_NOTE_PLING" : "BLOCK_NOTE_BLOCK_PLING";
         try {
             player.getWorld().playSound(player.getLocation(), Sound.valueOf(soundName), 3.0F, 0.5F);
         } catch (IllegalArgumentException e) {

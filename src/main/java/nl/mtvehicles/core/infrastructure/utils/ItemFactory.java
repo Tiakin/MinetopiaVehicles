@@ -48,7 +48,7 @@ public class ItemFactory {
 
     @VersionSpecific
     public ItemFactory setDurability(int durability) {
-        if (getServerVersion().is1_12()) this.item.setDurability((short) durability);
+        if (getServerVersion().is1_12_R1()) this.item.setDurability((short) durability);
         else {
             ItemMeta im = this.item.getItemMeta();
             ((org.bukkit.inventory.meta.Damageable) im).setDamage(durability);
