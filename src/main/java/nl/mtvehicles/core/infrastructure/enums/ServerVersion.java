@@ -98,7 +98,7 @@ public enum ServerVersion {
      */
     v1_21_R5,
     /**
-     * 1.21.9
+     * 1.21.9 and 1.21.10
      * @since 2.5.8
      */
     v1_21_R6;

@@ -26,7 +26,7 @@ public class PacketHandler {
 
 
 /**
-     * Packet handler for vehicle steering in 1.21.9
+     * Packet handler for vehicle steering in 1.21.9 and 1.21.10
      * @param player Player whose steering is being regarded
      */
     public static void movement_1_21_R6(Player player) {
