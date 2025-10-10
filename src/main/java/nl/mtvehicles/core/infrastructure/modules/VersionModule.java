@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.Setter;
 import nl.mtvehicles.core.Main;
 import nl.mtvehicles.core.infrastructure.annotations.VersionSpecific;
-import nl.mtvehicles.core.infrastructure.enums.PluginVersion;
 import nl.mtvehicles.core.infrastructure.enums.ServerVersion;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginDescriptionFile;
@@ -22,16 +21,13 @@ public class VersionModule {
     VersionModule instance;
 
     /**
-     * The plugin's version as String (e.g. '2.4.2')
-     */
-    public static String pluginVersionString;
-    /**
-     * The plugin's version as enum
-     * @see PluginVersion
-     * @deprecated PluginVersion enum is no longer used, use {@link #pluginVersionString} instead. (Auto-updater is no longer handled in the plugin, but on the server)
+     * The plugin's current version
+     *
+     * @deprecated Use {@link #getPluginVersion()} to access the variable. (This variable may be private in future versions.)
+     * @see #getPluginVersion()
      */
     @Deprecated
-    public static PluginVersion pluginVersion;
+    public static String pluginVersionString;
     /**
      * True if the plugin is a pre-release, release candidate or a dev-build
      */
@@ -53,7 +49,6 @@ public class VersionModule {
     public VersionModule() {
         PluginDescriptionFile pdf = Main.instance.getDescription();
         pluginVersionString = pdf.getVersion();
-        pluginVersion = PluginVersion.getPluginVersion();
 
         //Pre-releases should thus be named "vX.Y.Z-preU" etc... (Instead of pre, dev for developing and rc for release candidates are acceptable too.)
         isPreRelease = pluginVersionString.toLowerCase().contains("pre") || pluginVersionString.toLowerCase().contains("rc") || pluginVersionString.toLowerCase().contains("dev");
@@ -68,6 +63,14 @@ public class VersionModule {
                 serverVersion = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
             }
         }
+    }
+
+    /**
+     * The correct approach to get the plugin's version (as String – e.g. '2.4.2')
+     * @since 2.5.8
+     */
+    public static String getPluginVersion(){
+        return pluginVersionString;
     }
 
     /**

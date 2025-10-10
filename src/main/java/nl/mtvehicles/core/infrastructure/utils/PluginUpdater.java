@@ -22,7 +22,7 @@ import java.util.List;
 @ToDo("Translate to multiple languages.")
 public class PluginUpdater {
     private static boolean isEnabled = (boolean) ConfigModule.defaultConfig.get(DefaultConfig.Option.AUTO_UPDATE);
-    private static String pluginVersion = VersionModule.pluginVersionString;
+    private static String pluginVersion = VersionModule.getPluginVersion();
     private static String latestVersion;
 
     private static String getAPICheckerOutput(){
