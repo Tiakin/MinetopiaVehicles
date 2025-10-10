@@ -24,6 +24,7 @@ public class VehicleHelp extends MTVSubCommand {
         sendMessage(String.format("&2/vehicle &aaddmember &f- &2%s", desc(Message.HELP_ADD_MEMBER)));
         sendMessage(String.format("&2/vehicle &aremoverider &f- &2%s", desc(Message.HELP_REMOVE_RIDER)));
         sendMessage(String.format("&2/vehicle &aremovemember &f- &2%s", desc(Message.HELP_REMOVE_MEMBER)));
+        sendMessage(String.format("&2/vehicle &abuy &f- &2%s", desc(Message.HELP_NEW_BUY)));
         if (sender.hasPermission("mtvehicles.admin")) {
             sendMessage("");
             sendMessage(String.format("&2/vehicle &alanguage &f- &2%s", desc(Message.ADMIN_LANGUAGE)));
@@ -35,15 +36,14 @@ public class VehicleHelp extends MTVSubCommand {
             sendMessage(String.format("&2/vehicle &afuel &f- &2%s", desc(Message.ADMIN_FUEL)));
             sendMessage(String.format("&2/vehicle &arestore &f- &2%s", desc(Message.ADMIN_RESTORE)));
             sendMessage(String.format("&2/vehicle &areload &f- &2%s", desc(Message.ADMIN_RELOAD)));
-            sendMessage(String.format("&2/vehicle &agivevoucher &f- &2%s", desc(Message.ADMIN_GIVEVOUCHER)));
-            sendMessage(String.format("&2/vehicle &agivecar &f- &2%s", desc(Message.ADMIN_GIVECAR)));
+            sendMessage(String.format("&2/vehicle &agive &f- &2%s", desc(Message.ADMIN_NEW_GIVE)));
             sendMessage(String.format("&2/vehicle &asetowner &f- &2%s", desc(Message.ADMIN_SETOWNER)));
             sendMessage(String.format("&2/vehicle &aupdate &f- &2%s", desc(Message.ADMIN_UPDATE)));
             sendMessage(String.format("&2/vehicle &adelete &f- &2%s", desc(Message.ADMIN_DELETE)));
             sendMessage(String.format("&2/vehicle &agivefuel &f- &2%s", desc(Message.ADMIN_GIVEFUEL)));
         }
         sendMessage("");
-        sendMessage("&7&oDownload it for free at mtvehicles.nl (Originally by GamerJoep_, maintained by Nikd0 and gmrrh)");
+        sendMessage("&7&oDownload it for free at mtvehicles.nl (Maintained by Nikd0, gmrrh and Tiakin)");
         return true;
     }
 
