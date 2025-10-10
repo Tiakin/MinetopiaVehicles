@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.Setter;
 import nl.mtvehicles.core.Main;
 import nl.mtvehicles.core.infrastructure.annotations.VersionSpecific;
-import nl.mtvehicles.core.infrastructure.enums.PluginVersion;
 import nl.mtvehicles.core.infrastructure.enums.ServerVersion;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginDescriptionFile;
@@ -22,16 +21,13 @@ public class VersionModule {
     VersionModule instance;
 
     /**
-     * The plugin's version as String (e.g. '2.4.2')
-     */
-    public static String pluginVersionString;
-    /**
-     * The plugin's version as enum
-     * @see PluginVersion
-     * @deprecated PluginVersion enum is no longer used, use {@link #pluginVersionString} instead. (Auto-updater is no longer handled in the plugin, but on the server)
+     * The plugin's current version
+     *
+     * @deprecated Use {@link #getPluginVersion()} to access the variable. (This variable may be private in future versions.)
+     * @see #getPluginVersion()
      */
     @Deprecated
-    public static PluginVersion pluginVersion;
+    public static String pluginVersionString;
     /**
      * True if the plugin is a pre-release, release candidate or a dev-build
      */
@@ -53,7 +49,6 @@ public class VersionModule {
     public VersionModule() {
         PluginDescriptionFile pdf = Main.instance.getDescription();
         pluginVersionString = pdf.getVersion();
-        pluginVersion = PluginVersion.getPluginVersion();
 
         //Pre-releases should thus be named "vX.Y.Z-preU" etc... (Instead of pre, dev for developing and rc for release candidates are acceptable too.)
         isPreRelease = pluginVersionString.toLowerCase().contains("pre") || pluginVersionString.toLowerCase().contains("rc") || pluginVersionString.toLowerCase().contains("dev");
@@ -68,6 +63,14 @@ public class VersionModule {
                 serverVersion = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
             }
         }
+    }
+
+    /**
+     * The correct approach to get the plugin's version (as String – e.g. '2.4.2')
+     * @since 2.5.8
+     */
+    public static String getPluginVersion(){
+        return pluginVersionString;
     }
 
     /**
@@ -171,6 +174,11 @@ public class VersionModule {
             case "v1_21_R5":
                 returns = ServerVersion.v1_21_R5;
                 break;
+            case "1.21.9":
+            case "1.21.10":
+            case "v1_21_R6":
+                returns = ServerVersion.v1_21_R6;
+                break;
 
         }
         return returns;
@@ -185,8 +193,8 @@ public class VersionModule {
     public boolean isSupportedVersion(){
 
         List<String> highestVersions = Arrays.asList(
-                "1.12.2", "1.13.2", "1.15.2", "1.16.5", "1.17.1", "1.18.2", "1.19.4", "1.20.6", "1.21.1", "1.21.3", "1.21.4", "1.21.5", "1.21.6", "1.21.7", "1.21.8",
-                "v1_21_R5", "v1_21_R4", "v1_21_R3", "v1_21_R2", "v1_21_R1", "v1_20_R4", "v1_19_R3", "v1_18_R2", "v1_17_R1", "v1_16_R3", "v1_15_R1", "v1_13_R2", "v1_12_R1"
+                "1.12.2", "1.13.2", "1.15.2", "1.16.5", "1.17.1", "1.18.2", "1.19.4", "1.20.6", "1.21.1", "1.21.3", "1.21.4", "1.21.5", "1.21.6", "1.21.7", "1.21.8", "1.21.9", "1.21.10",
+                "v1_21_R6", "v1_21_R5", "v1_21_R4", "v1_21_R3", "v1_21_R2", "v1_21_R1", "v1_20_R4", "v1_19_R3", "v1_18_R2", "v1_17_R1", "v1_16_R3", "v1_15_R1", "v1_13_R2", "v1_12_R1"
 
         );
 

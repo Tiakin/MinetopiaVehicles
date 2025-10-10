@@ -44,7 +44,7 @@ public class PlaceholderUtils extends PlaceholderExpansion {
 
     @Override
     public String getVersion() {
-        return VersionModule.pluginVersionString;
+        return VersionModule.getPluginVersion();
     }
 
     @Override

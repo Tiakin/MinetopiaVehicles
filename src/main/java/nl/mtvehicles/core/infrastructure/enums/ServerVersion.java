@@ -6,7 +6,8 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Enum of supported server versions (used for different NMS and Spigot API changes)
+ * Enum of supported server versions (used for different NMS and Spigot API
+ * changes)
  */
 @VersionSpecific
 public enum ServerVersion {
@@ -40,56 +41,67 @@ public enum ServerVersion {
     v1_18_R2(PacketHandler::movement_1_18_R2),
     /**
      * 1.19-1.19.2
+     * 
      * @since 2.4.3
      */
     v1_19_R1(PacketHandler::movement_1_19_R1),
     /**
      * 1.19.3
+     * 
      * @since 2.5.0
      */
     v1_19_R2(PacketHandler::movement_1_19_R2),
     /**
      * 1.19.4
+     * 
      * @since 2.5.0
      */
     v1_19_R3(PacketHandler::movement_1_19_R3),
     /**
      * 1.20 and 1.20.1
+     * 
      * @since 2.5.6
      */
     v1_20_R1(PacketHandler::movement_1_20_R1),
     /**
      * 1.20.2
+     * 
      * @since 2.5.2
      */
     v1_20_R2(PacketHandler::movement_1_20_R2),
     /**
      * 1.20.3 and 1.20.4
+     * 
      * @since 2.5.2
      */
     v1_20_R3(PacketHandler::movement_1_20_R3),
     /**
      * 1.20.5 and 1.20.6
+     * 
      * @since 2.5.4
      */
     v1_20_R4(PacketHandler::movement_1_20_R4),
     /**
      * 1.21 and 1.21.1
+     * 
      * @since 2.5.4
      */
     v1_21_R1(PacketHandler::movement_1_21_R1),
     /**
      * 1.21.2 and 1.21.3
+     * 
      * @since 2.5.5
      */
     v1_21_R2(PacketHandler::movement_1_21_R2),
     /**
      * 1.21.4
+     * 
      * @since 2.5.5
      */
     v1_21_R3(PacketHandler::movement_1_21_R3),
     /**
      * 1.21.5
+     * 
      * @since 2.5.6
      */
     v1_21_R4(PacketHandler::movement_1_21_R4),
@@ -98,7 +110,13 @@ public enum ServerVersion {
      * 
      * @since 2.5.6
      */
-    v1_21_R5(PacketHandler::movement_1_21_R5);
+    v1_21_R5(PacketHandler::movement_1_21_R5),
+    /**
+     * 1.21.9 and 1.21.10
+     * 
+     * @since 2.5.8
+     */
+    v1_21_R6(PacketHandler::movement_1_21_R6);
 
     /**
      * Function interface for packet movement handlers
@@ -115,75 +133,120 @@ public enum ServerVersion {
 
     /**
      * Get the movement handler for this server version
+     * 
      * @return The movement handler for this version
      */
     public MovementHandler getMovementHandler() {
         return this.movementHandler;
     }
 
-    public boolean is1_12_R1(){return this.equals(v1_12_R1);}
+    public boolean is1_12_R1() {
+        return this.equals(v1_12_R1);
+    }
 
-    public boolean is1_13_R2(){return this.equals(v1_13_R2);}
+    public boolean is1_13_R2() {
+        return this.equals(v1_13_R2);
+    }
 
-    public boolean is1_15_R1(){return this.equals(v1_15_R1);}
+    public boolean is1_15_R1() {
+        return this.equals(v1_15_R1);
+    }
 
-    public boolean is1_16_R3(){return this.equals(v1_16_R3);}
+    public boolean is1_16_R3() {
+        return this.equals(v1_16_R3);
+    }
 
-    public boolean is1_17_R1(){return this.equals(v1_17_R1);}
+    public boolean is1_17_R1() {
+        return this.equals(v1_17_R1);
+    }
 
-    public boolean is1_18_R1(){return this.equals(v1_18_R1);}
+    public boolean is1_18_R1() {
+        return this.equals(v1_18_R1);
+    }
 
-    public boolean is1_18_R2(){return this.equals(v1_18_R2);}
+    public boolean is1_18_R2() {
+        return this.equals(v1_18_R2);
+    }
 
-    public boolean is1_19_R1(){return this.equals(v1_19_R1);}
+    public boolean is1_19_R1() {
+        return this.equals(v1_19_R1);
+    }
 
-    public boolean is1_19_R2(){return this.equals(v1_19_R2);}
+    public boolean is1_19_R2() {
+        return this.equals(v1_19_R2);
+    }
 
-    public boolean is1_19_R3(){return this.equals(v1_19_R3);}
+    public boolean is1_19_R3() {
+        return this.equals(v1_19_R3);
+    }
 
-    public boolean is1_20_R1() {return this.equals(v1_20_R1);}
+    public boolean is1_20_R1() {
+        return this.equals(v1_20_R1);
+    }
 
-    public boolean is1_20_R2() {return this.equals(v1_20_R2);}
+    public boolean is1_20_R2() {
+        return this.equals(v1_20_R2);
+    }
 
-    public boolean is1_20_R3() {return this.equals(v1_20_R3);}
+    public boolean is1_20_R3() {
+        return this.equals(v1_20_R3);
+    }
 
-    public boolean is1_20_R4(){return this.equals(v1_20_R4);}
+    public boolean is1_20_R4() {
+        return this.equals(v1_20_R4);
+    }
 
-    public boolean is1_21_R1(){return this.equals(v1_21_R1);}
+    public boolean is1_21_R1() {
+        return this.equals(v1_21_R1);
+    }
 
-    public boolean is1_21_R2(){return this.equals(v1_21_R2);}
+    public boolean is1_21_R2() {
+        return this.equals(v1_21_R2);
+    }
 
-    public boolean is1_21_R3(){return this.equals(v1_21_R3);}
+    public boolean is1_21_R3() {
+        return this.equals(v1_21_R3);
+    }
 
-    public boolean is1_21_R4(){return this.equals(v1_21_R4);}
-    
-    public boolean is1_21_R5(){return this.equals(v1_21_R5);}
+    public boolean is1_21_R4() {
+        return this.equals(v1_21_R4);
+    }
+
+    public boolean is1_21_R5() {
+        return this.equals(v1_21_R5);
+    }
+
+    public boolean is1_21_R6() {
+        return this.equals(v1_21_R6);
+    }
 
     /**
      * Check whether the server version is older than the given one
      */
-    public boolean isOlderThan(@NotNull ServerVersion version){
+    public boolean isOlderThan(@NotNull ServerVersion version) {
         return this.ordinal() < version.ordinal();
     }
 
     /**
-     * Check whether the server version is older than the given one or whether it is the same
+     * Check whether the server version is older than the given one or whether it is
+     * the same
      */
-    public boolean isOlderOrEqualTo(@NotNull ServerVersion version){
+    public boolean isOlderOrEqualTo(@NotNull ServerVersion version) {
         return this.ordinal() <= version.ordinal();
     }
 
     /**
      * Check whether the server version is newer than the given one
      */
-    public boolean isNewerThan(@NotNull ServerVersion version){
+    public boolean isNewerThan(@NotNull ServerVersion version) {
         return this.ordinal() > version.ordinal();
     }
 
     /**
-     * Check whether the server version is newer than the given one or whether it is the same
+     * Check whether the server version is newer than the given one or whether it is
+     * the same
      */
-    public boolean isNewerOrEqualTo(@NotNull ServerVersion version){
+    public boolean isNewerOrEqualTo(@NotNull ServerVersion version) {
         return this.ordinal() >= version.ordinal();
     }
 
