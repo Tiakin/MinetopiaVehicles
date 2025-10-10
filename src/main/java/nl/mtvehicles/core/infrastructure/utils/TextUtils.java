@@ -22,20 +22,6 @@ public class TextUtils {
     }
 
     /**
-     * Get license plate from vehicle armor stand's name
-     * @param license Name of the vehicle
-     * @return Vehicle's license plate
-     * @deprecated Use {@link VehicleUtils#getLicensePlate(Entity)} instead.
-     */
-    @Deprecated
-    public static String licenseReplacer(String license) {
-        if (license.split("_").length > 1) {
-            return license.split("_")[2];
-        }
-        return null;
-    }
-
-    /**
      * Get a List from multiple Strings
      */
     public static List<String> list(String... strings){
