@@ -25,6 +25,8 @@ adminDelete: "ลบยานพาหนะที่ถืออยู่ออ
 adminRefill: "เติมน้ำมัน"
 adminRepair: "ซ่อมแซมยานพาหนะ (ถ้าระบบความเสียหายถูกเปิดอยู่)"
 adminGivefuel: "Give fuel to a player"
+adminNewGive: "Give a vehicle or voucher to a player"
+helpNewBuy: "Buy a vehicle or voucher for yourself"
 reloadSuccesvol: "&2คุณได้&aรีโหลดปลั๊กอิน&2เสร็จสมบูรณ์"
 notForConsole: "&cเฉพาะผู้เล่นสามารถใช้คำสั่งนี้ได้"
 cmdNotExists: "&cไม่พบคำสั่ง"

@@ -30,6 +30,8 @@ public enum Message {
     ADMIN_REFILL,
     ADMIN_REPAIR,
     ADMIN_GIVEFUEL,
+    ADMIN_NEW_GIVE,
+    HELP_NEW_BUY,
     RELOAD_SUCCESSFUL("reloadSuccesvol"),
     NOT_FOR_CONSOLE,
     COMMAND_DOES_NOT_EXIST("cmdNotExists"),

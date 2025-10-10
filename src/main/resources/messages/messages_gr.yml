@@ -24,6 +24,8 @@ adminDelete: "Αφαιρέστε ένα όχημα στο χέρι σας από
 adminRefill: "Γεμίστε ξανά το όχημα με καύσιμο"
 adminRepair: "Επισκευάστε το όχημα (αν είναι ενεργοποιημένη η ζημιά του οχήματος)"
 adminGivefuel: "Give fuel to a player"
+adminNewGive: "Give a vehicle or voucher to a player"
+helpNewBuy: "Buy a vehicle or voucher for yourself"
 reloadSuccesvol: "&2Έχετε &επιτυχώς &2επαναφορτωση την προσθήκη!"
 notForConsole: "&cΜόνο ένας παίκτης μπορεί να το κάνει αυτό!"
 cmdNotExists: "&cΑυτή η εντολή δεν υπάρχει!"
