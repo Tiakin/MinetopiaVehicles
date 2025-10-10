@@ -25,6 +25,8 @@ adminDelete: "Удалить транспорт в руке из базы дан
 adminRefill: "Пополнить топливо транспорта"
 adminRepair: "Починить транспорт (Если включён урон для транспорта)"
 adminGivefuel: "Give fuel to a player"
+adminNewGive: "Give a vehicle or voucher to a player"
+helpNewBuy: "Buy a vehicle or voucher for yourself"
 reloadSuccesvol: "&2Вы &aуспешно &2перезагрузили плагин!"
 notForConsole: "&cДоступно только игрокам!"
 cmdNotExists: "&cЭтой команды не существует!"
