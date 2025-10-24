@@ -695,26 +695,18 @@ public class VehicleMovement {
      */
     @VersionSpecific
     protected void teleportSeat(ArmorStand seat, Location loc){
-        if (getServerVersion().is1_12_R1()) teleportSeat(((org.bukkit.craftbukkit.v1_12_R1.entity.CraftEntity) seat).getHandle(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
-        else if (getServerVersion().is1_13_R2()) teleportSeat(((org.bukkit.craftbukkit.v1_13_R2.entity.CraftEntity) seat).getHandle(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
-        else if (getServerVersion().is1_15_R1()) teleportSeat(((org.bukkit.craftbukkit.v1_15_R1.entity.CraftEntity) seat).getHandle(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
-        else if (getServerVersion().is1_16_R3()) teleportSeat(((org.bukkit.craftbukkit.v1_16_R3.entity.CraftEntity) seat).getHandle(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
-        else if (getServerVersion().is1_17_R1()) teleportSeat(((org.bukkit.craftbukkit.v1_17_R1.entity.CraftEntity) seat).getHandle(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
-        else if (getServerVersion().is1_18_R1()) teleportSeat(((org.bukkit.craftbukkit.v1_18_R1.entity.CraftEntity) seat).getHandle(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
-        else if (getServerVersion().is1_18_R2()) teleportSeat(((org.bukkit.craftbukkit.v1_18_R2.entity.CraftEntity) seat).getHandle(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
-        else if (getServerVersion().is1_19_R1()) teleportSeat(((org.bukkit.craftbukkit.v1_19_R1.entity.CraftEntity) seat).getHandle(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
-        else if (getServerVersion().is1_19_R2()) teleportSeat(((org.bukkit.craftbukkit.v1_19_R2.entity.CraftEntity) seat).getHandle(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
-        else if (getServerVersion().is1_19_R3()) teleportSeat(((org.bukkit.craftbukkit.v1_19_R3.entity.CraftEntity) seat).getHandle(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
-        else if (getServerVersion().is1_20_R1()) teleportSeat(((org.bukkit.craftbukkit.v1_20_R1.entity.CraftEntity) seat).getHandle(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
-        else if (getServerVersion().is1_20_R2()) teleportSeat(((org.bukkit.craftbukkit.v1_20_R2.entity.CraftEntity) seat).getHandle(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
-        else if (getServerVersion().is1_20_R3()) teleportSeat(((org.bukkit.craftbukkit.v1_20_R3.entity.CraftEntity) seat).getHandle(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
-        else if (getServerVersion().is1_20_R4()) teleportSeat(((org.bukkit.craftbukkit.v1_20_R4.entity.CraftEntity) seat).getHandle(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
-        else if (getServerVersion().is1_21_R1()) teleportSeat(((org.bukkit.craftbukkit.v1_21_R1.entity.CraftEntity) seat).getHandle(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
-        else if (getServerVersion().is1_21_R2()) teleportSeat(((org.bukkit.craftbukkit.v1_21_R2.entity.CraftEntity) seat).getHandle(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
-        else if (getServerVersion().is1_21_R3()) teleportSeat(((org.bukkit.craftbukkit.v1_21_R3.entity.CraftEntity) seat).getHandle(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
-        else if (getServerVersion().is1_21_R4()) teleportSeat(((org.bukkit.craftbukkit.v1_21_R4.entity.CraftEntity) seat).getHandle(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
-        else if (getServerVersion().is1_21_R5()) teleportSeat(((org.bukkit.craftbukkit.v1_21_R5.entity.CraftEntity) seat).getHandle(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
-        else if (getServerVersion().is1_21_R6()) teleportSeat(((org.bukkit.craftbukkit.v1_21_R6.entity.CraftEntity) seat).getHandle(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
+        try {
+            String version = getServerVersion().name();
+            String craftEntityClassName = "org.bukkit.craftbukkit." + version + ".entity.CraftEntity";
+            Class<?> craftEntityClass = Class.forName(craftEntityClassName);
+
+            Method getHandleMethod = craftEntityClass.getMethod("getHandle");
+            Object handle = getHandleMethod.invoke(seat);
+            
+            teleportSeat(handle, loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**

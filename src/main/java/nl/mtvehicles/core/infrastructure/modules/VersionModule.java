@@ -43,7 +43,7 @@ public class VersionModule {
     /**
      * Server Version
      */
-    private static @Getter ServerVersion serverVersion;
+    private static ServerVersion serverVersion;
 
     private Logger logger = Main.instance.getLogger();
 
@@ -79,6 +79,14 @@ public class VersionModule {
     /**
      * Get the server version as enum
      * @return Server version
+     */
+    public static ServerVersion getServerVersion() {
+        return serverVersion;
+    }
+    
+    /**
+     * Select the server version based on a string
+     * @param serverVersionString Server version string
      */
     private static void selectServerVersion(String serverVersionString){
         switch (serverVersionString) {
