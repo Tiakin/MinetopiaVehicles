@@ -880,7 +880,7 @@ public class PacketHandler {
             }
             if (!channel.pipeline().names().contains(player.getName())) return;
             channel.pipeline().remove(player.getName());
-            movement_1_16_R3(player);
+            movement_1_12_R1(player);
         } catch (NoSuchElementException e) {
             //It isn't good practice to ignore exceptions, but I'll keep it like this for now :)
         }
