@@ -37,13 +37,14 @@ public class VersionModule {
      */
     public static boolean isDevRelease;
     /**
-     * The server's minecraft version (e.g. '1_16_R3')
-     */
-    private static String serverVersion;
-    /**
      * The server's software (e.g. 'Paper')
      */
-    public static String serverSoftware;
+    private static String serverSoftware;
+    /**
+     * Server Version
+     */
+    private static @Getter ServerVersion serverVersion;
+
     private Logger logger = Main.instance.getLogger();
 
     public VersionModule() {
@@ -57,11 +58,13 @@ public class VersionModule {
 
         //Check Server Version
         if(!serverSoftware.contains("Arclight")){
+            String serverVersionString;
             try {
-                serverVersion = Bukkit.getServer().getMinecraftVersion();
+                serverVersionString = Bukkit.getServer().getMinecraftVersion();
             } catch (NoSuchMethodError e){
-                serverVersion = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
+                serverVersionString = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
             }
+            selectServerVersion(serverVersionString);
         }
     }
 
@@ -77,111 +80,108 @@ public class VersionModule {
      * Get the server version as enum
      * @return Server version
      */
-    @VersionSpecific
-    public static ServerVersion getServerVersion(){
-        ServerVersion returns = null;
-        switch (serverVersion) {
+    private static void selectServerVersion(String serverVersionString){
+        switch (serverVersionString) {
             case "1.12":
             case "1.12.1":
             case "1.12.2":
             case "v1_12_R1":
-                returns = ServerVersion.v1_12_R1;
+                serverVersion = ServerVersion.v1_12_R1;
                 break;
             case "1.13.1":
             case "1.13.2":
             case "v1_13_R2":
-                returns = ServerVersion.v1_13_R2;
+                serverVersion = ServerVersion.v1_13_R2;
                 break;
             case "1.15":
             case "1.15.1":
             case "1.15.2":
             case "v1_15_R1":
-                returns = ServerVersion.v1_15_R1;
+                serverVersion = ServerVersion.v1_15_R1;
                 break;
             case "1.16.4":
             case "1.16.5":
             case "v1_16_R3":
-                returns = ServerVersion.v1_16_R3;
+                serverVersion = ServerVersion.v1_16_R3;
                 break;
             case "1.17":
             case "1.17.1":
             case "v1_17_R1":
-                returns = ServerVersion.v1_17_R1;
+                serverVersion = ServerVersion.v1_17_R1;
                 break;
             case "1.18":
             case "1.18.1":
             case "v1_18_R1":
-                returns = ServerVersion.v1_18_R1;
+                serverVersion = ServerVersion.v1_18_R1;
                 break;
             case "1.18.2":
             case "v1_18_R2":
-                returns = ServerVersion.v1_18_R2;
+                serverVersion = ServerVersion.v1_18_R2;
                 break;
             case "1.19":
             case "1.19.1":
             case "1.19.2":
             case "v1_19_R1":
-                returns = ServerVersion.v1_19_R1;
+                serverVersion = ServerVersion.v1_19_R1;
                 break;
             case "1.19.3":
             case "v1_19_R2":
-                returns = ServerVersion.v1_19_R2;
+                serverVersion = ServerVersion.v1_19_R2;
                 break;
             case "1.19.4":
             case "v1_19_R3":
-                returns = ServerVersion.v1_19_R3;
+                serverVersion = ServerVersion.v1_19_R3;
                 break;
             case "1.20":
             case "1.20.1":
             case "v1_20_R1":
-                returns = ServerVersion.v1_20_R1;
+                serverVersion = ServerVersion.v1_20_R1;
                 break;
             case "1.20.2":
             case "1.20.3":
             case "v1_20_R2":
-                returns = ServerVersion.v1_20_R2;
+                serverVersion = ServerVersion.v1_20_R2;
                 break;
             case "1.20.4":
             case "1.20.5":
             case "v1_20_R3":
-                returns = ServerVersion.v1_20_R3;
+                serverVersion = ServerVersion.v1_20_R3;
                 break;
             case "1.20.6":
             case "v1_20_R4":
-                returns = ServerVersion.v1_20_R4;
+                serverVersion = ServerVersion.v1_20_R4;
                 break;
             case "1.21":
             case "1.21.1":
             case "1.21.2":
             case "v1_21_R1":
-                returns = ServerVersion.v1_21_R1;
+                serverVersion = ServerVersion.v1_21_R1;
                 break;
             case "1.21.3":
             case "v1_21_R2":
-                returns = ServerVersion.v1_21_R2;
+                serverVersion = ServerVersion.v1_21_R2;
                 break;
             case "1.21.4":
             case "v1_21_R3":
-                returns = ServerVersion.v1_21_R3;
+                serverVersion = ServerVersion.v1_21_R3;
                 break;
             case "1.21.5":
             case "v1_21_R4":
-                returns = ServerVersion.v1_21_R4;
+                serverVersion = ServerVersion.v1_21_R4;
                 break;
             case "1.21.6":
             case "1.21.7":
             case "1.21.8":
             case "v1_21_R5":
-                returns = ServerVersion.v1_21_R5;
+                serverVersion = ServerVersion.v1_21_R5;
                 break;
             case "1.21.9":
             case "1.21.10":
             case "v1_21_R6":
-                returns = ServerVersion.v1_21_R6;
+                serverVersion = ServerVersion.v1_21_R6;
                 break;
 
         }
-        return returns;
     }
 
     /**
@@ -197,13 +197,13 @@ public class VersionModule {
                 "v1_21_R6", "v1_21_R5", "v1_21_R4", "v1_21_R3", "v1_21_R2", "v1_21_R1", "v1_20_R4", "v1_19_R3", "v1_18_R2", "v1_17_R1", "v1_16_R3", "v1_15_R1", "v1_13_R2", "v1_12_R1"
 
         );
-
+        String serverVersionString = null;
         //Check Server Version
         if(!serverSoftware.contains("Arclight")){
             try {
-                serverVersion = Bukkit.getServer().getMinecraftVersion();
+                serverVersionString = Bukkit.getServer().getMinecraftVersion();
             } catch (NoSuchMethodError e){
-                serverVersion = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
+                serverVersionString = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
             }
         }
 
@@ -216,7 +216,7 @@ public class VersionModule {
             return false;
         }
 
-        else if (!highestVersions.contains(serverVersion)) {
+        else if (!highestVersions.contains(serverVersionString)) {
             logger.warning("--------------------------");
             logger.warning("Your Server does not run the latest patch version (e.g. you may be running 1.18 instead of 1.18.2 etc...).");
             logger.warning("The plugin WILL load but it MAY NOT work properly. UPDATE.");
