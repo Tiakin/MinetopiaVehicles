@@ -1,6 +1,5 @@
 package nl.mtvehicles.core.infrastructure.vehicle;
 
-import nl.mtvehicles.core.Main;
 import nl.mtvehicles.core.infrastructure.dataconfig.DefaultConfig;
 import nl.mtvehicles.core.infrastructure.dataconfig.VehicleDataConfig;
 import nl.mtvehicles.core.infrastructure.enums.VehicleType;
@@ -46,12 +45,6 @@ public class Vehicle {
     private List<String> riders;
     private List<String> members;
     private @Nullable Map<?, ?> vehicleData;
-
-    /**
-     * @deprecated There is no use for this HashMap. Please, avoid using it in any way as it may get removed soon.
-     */
-    @Deprecated
-    public static HashMap<String, MTVSubCommand> subcommands = new HashMap<>();
 
     /**
      * Plain constructor
@@ -247,23 +240,7 @@ public class Vehicle {
         return isGlowing;
     }
 
-    /**
-     * @deprecated Use {@link #isGlowing()}
-     */
-    @Deprecated
-    public boolean isGlow() {
-        return isGlowing;
-    }
-
     public boolean isPublic() {
-        return isPublic;
-    }
-
-    /**
-     * @deprecated Use {@link #isPublic()}
-     */
-    @Deprecated
-    public boolean isOpen() {
         return isPublic;
     }
 
@@ -367,23 +344,7 @@ public class Vehicle {
         this.isGlowing = glow;
     }
 
-    /**
-     * @deprecated Use {@link #setGlowing(boolean)}
-     */
-    @Deprecated
-    public void setGlow(boolean glow) {
-        this.isGlowing = glow;
-    }
-
     public void setPublic(boolean isPublic) {
-        this.isPublic = isPublic;
-    }
-
-    /**
-     * @deprecated Use {@link #setPublic(boolean)}
-     */
-    @Deprecated
-    public void setOpen(boolean isPublic) {
         this.isPublic = isPublic;
     }
 
@@ -441,18 +402,6 @@ public class Vehicle {
 
     public void setMaxSpeedBackwards(double maxSpeedBackwards) {
         this.maxSpeedBackwards = maxSpeedBackwards;
-    }
-
-    /**
-     * @deprecated Use {@link #setOwner(UUID)} instead.
-     */
-    @Deprecated
-    public void setOwner(String ownerUUID) {
-        try {
-            this.owner = UUID.fromString(ownerUUID);
-        } catch (IllegalArgumentException e){
-            Main.logSevere("An error occurred while setting a vehicle's owner. This may lead to further issues...");
-        }
     }
 
     public void setOwner(UUID owner){

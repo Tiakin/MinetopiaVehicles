@@ -154,17 +154,6 @@ public final class VehicleUtils {
         return getVehicle(getDrivenVehiclePlate(p));
     }
 
-
-
-    /**
-     * Create a vehicle and get its item by UUID (UUID may be found in vehicles.yml)
-     * @deprecated Renamed to {@link #createAndGetItemByUUID(OfflinePlayer, String)} for clarity.
-     */
-    @Deprecated
-    public static ItemStack getItemByUUID(Player p, String uuid) {
-        return createAndGetItemByUUID(p, uuid);
-    }
-
     /**
      * Check if given UUID exists (to prevent further issues)
      * @since 2.5.1

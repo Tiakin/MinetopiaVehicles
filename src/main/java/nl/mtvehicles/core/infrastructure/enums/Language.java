@@ -98,17 +98,6 @@ public enum Language {
     }
 
     /**
-     * Get an array of all languages (in their country codes)
-     * @return Array of all supported language codes
-     *
-     * @deprecated Use {@link #getAllLanguageCodes()} instead
-     */
-    @Deprecated
-    public static String[] getAllLanguages(){
-        return (String[]) getAllLanguageCodes().toArray();
-    }
-
-    /**
      * Get an array of all language codes
      * @return Array of all supported language codes
      */
