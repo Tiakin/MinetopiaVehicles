@@ -3,10 +3,7 @@ package nl.mtvehicles.core.movement;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
-import net.minecraft.server.level.EntityPlayer;
-import net.minecraft.server.network.PlayerConnection;
 import nl.mtvehicles.core.Main;
-import nl.mtvehicles.core.infrastructure.annotations.ToDo;
 import nl.mtvehicles.core.infrastructure.annotations.VersionSpecific;
 import nl.mtvehicles.core.infrastructure.enums.ServerVersion;
 import nl.mtvehicles.core.movement.versions.VehicleMovement1_12;
@@ -14,7 +11,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.Field;
-import java.util.NoSuchElementException;
+import java.lang.reflect.Method;
 
 import static nl.mtvehicles.core.infrastructure.modules.VersionModule.getServerVersion;
 
@@ -24,177 +21,150 @@ import static nl.mtvehicles.core.infrastructure.modules.VersionModule.getServerV
 @VersionSpecific
 public class PacketHandler {
 
-
-/**
-     * Packet handler for vehicle steering in 1.21.9 and 1.21.10
+    /**
+     * Generic packet handler using reflection.
      * @param player Player whose steering is being regarded
+     * @param useRepeatingTask Whether to use repeating task or not (for 1.21.2+)
+     * @param playerConnectionFieldName Name of the field to get PlayerConnection from EntityPlayer
+     * @param networkManagerFieldName Name of the field to get NetworkManager from PlayerConnection
+     * @param channelFieldName Name of the field to get Channel from NetworkManager
      */
-    public static void movement_1_21_R6(Player player) {
-        ChannelDuplexHandler channelDuplexHandler = new ChannelDuplexHandler() {
-            private net.minecraft.network.protocol.game.PacketPlayInSteerVehicle lastPacket = null;
-            private int taskId = -1;
-
-            public void channelRead(ChannelHandlerContext channelHandlerContext, Object packet) throws Exception {
-                super.channelRead(channelHandlerContext, packet);
-                if (packet instanceof net.minecraft.network.protocol.game.PacketPlayInSteerVehicle) {
-                    net.minecraft.network.protocol.game.PacketPlayInSteerVehicle ppisv = (net.minecraft.network.protocol.game.PacketPlayInSteerVehicle) packet;
-                    lastPacket = ppisv;
-
-                    if (taskId != -1) {
-                        Bukkit.getScheduler().cancelTask(taskId);
-                    }
-
-                    taskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(Main.instance, () -> {
-                        if (player.isInsideVehicle()) {
-                            VehicleMovement movement = new VehicleMovement();
-                            movement.vehicleMovement(player, lastPacket);
-                        } else {
-                            Bukkit.getScheduler().cancelTask(taskId);
-                            taskId = -1;
-                        }
-                    }, 0L, 1L);
-                }
+    private static void setupPacketHandler(Player player, boolean useRepeatingTask, 
+                                          String playerConnectionFieldName, 
+                                          String networkManagerFieldName, 
+                                          String channelFieldName) {
+        
+        final Class<?> packetClass;
+        try {
+            String version = getServerVersion().name();
+            if (getServerVersion().isNewerOrEqualTo(ServerVersion.v1_17_R1)) {
+                packetClass = Class.forName("net.minecraft.network.protocol.game.PacketPlayInSteerVehicle");
+            } else {
+                packetClass = Class.forName("net.minecraft.server." + version + ".PacketPlayInSteerVehicle");
             }
-        };
+        } catch (ClassNotFoundException e) {
+            unexpectedException(e);
+            return;
+        }
+        
+        ChannelDuplexHandler channelDuplexHandler;
+        
+        if (useRepeatingTask) {
+            // Repeating task pattern for 1.21.2+
+            channelDuplexHandler = new ChannelDuplexHandler() {
+                private Object lastPacket = null;
+                private int taskId = -1;
+
+                @Override
+                public void channelRead(ChannelHandlerContext channelHandlerContext, Object packet) throws Exception {
+                    super.channelRead(channelHandlerContext, packet);
+                    if (packetClass.isInstance(packet)) {
+                        lastPacket = packet;
+
+                        if (taskId != -1) {
+                            Bukkit.getScheduler().cancelTask(taskId);
+                        }
+
+                        taskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(Main.instance, () -> {
+                            if (player.isInsideVehicle()) {
+                                VehicleMovement movement = new VehicleMovement();
+                                movement.vehicleMovement(player, lastPacket);
+                            } else {
+                                Bukkit.getScheduler().cancelTask(taskId);
+                                taskId = -1;
+                            }
+                        }, 0L, 1L);
+                    }
+                }
+            };
+        } else {
+            channelDuplexHandler = new ChannelDuplexHandler() {
+                @Override
+                public void channelRead(ChannelHandlerContext channelHandlerContext, Object packet) throws Exception {
+                    super.channelRead(channelHandlerContext, packet);
+                    if (packetClass.isInstance(packet)) {
+                        // Special handling for 1.12
+                        if (getServerVersion().name().equals("v1_12_R1")) {
+                            VehicleMovement1_12 movement = new VehicleMovement1_12();
+                            movement.vehicleMovement(player, packet);
+                        } else {
+                            VehicleMovement movement = new VehicleMovement();
+                            movement.vehicleMovement(player, packet);
+                        }
+                    }
+                }
+            };
+        }
+        
         Channel channel = null;
         try {
-            Object entityPlayer = ((org.bukkit.craftbukkit.v1_21_R6.entity.CraftPlayer) player).getHandle();
-
-            Field playerConnectionField = entityPlayer.getClass().getField("g");
-            net.minecraft.server.network.PlayerConnection playerConnection = (net.minecraft.server.network.PlayerConnection) playerConnectionField.get(entityPlayer);
-            Field networkManagerField = net.minecraft.server.network.ServerCommonPacketListenerImpl.class.getDeclaredField("e");
+            // Build versioned CraftPlayer class name
+            String version = getServerVersion().name();
+            String craftPlayerClassName = "org.bukkit.craftbukkit." + version + ".entity.CraftPlayer";
+            Class<?> craftPlayerClass = Class.forName(craftPlayerClassName);
+            
+            // Get EntityPlayer handle
+            Method getHandleMethod = craftPlayerClass.getMethod("getHandle");
+            Object entityPlayer = getHandleMethod.invoke(player);
+            
+            // Get PlayerConnection
+            Field playerConnectionField = entityPlayer.getClass().getDeclaredField(playerConnectionFieldName);
+            playerConnectionField.setAccessible(true);
+            Object playerConnection = playerConnectionField.get(entityPlayer);
+            
+            // Get NetworkManager
+            Field networkManagerField;
+            if (getServerVersion().isNewerOrEqualTo(ServerVersion.v1_20_R2)) {
+                networkManagerField = Class.forName("net.minecraft.server.network.ServerCommonPacketListenerImpl")
+                    .getDeclaredField(networkManagerFieldName);
+            } else {
+                networkManagerField = playerConnection.getClass().getDeclaredField(networkManagerFieldName);
+            }
             networkManagerField.setAccessible(true);
-            net.minecraft.network.NetworkManager networkManager = (net.minecraft.network.NetworkManager) networkManagerField.get(playerConnection);
-            Field channelField = networkManager.getClass().getField("n");
+            Object networkManager = networkManagerField.get(playerConnection);
+            
+            Field channelField = networkManager.getClass().getDeclaredField(channelFieldName);
+            channelField.setAccessible(true);
             channel = (Channel) channelField.get(networkManager);
 
-            channel.pipeline()
-                    .addBefore("packet_handler", player.getName(), channelDuplexHandler);
-        } catch (IllegalArgumentException e) { //in case of plugin reload, prevent duplicate handler name exception
+            channel.pipeline().addBefore("packet_handler", player.getName(), channelDuplexHandler);
+            
+        } catch (IllegalArgumentException e) {
+            // In case of plugin reload, prevent duplicate handler name exception
             if (channel == null) {
                 unexpectedException(e);
                 return;
             }
             if (!channel.pipeline().names().contains(player.getName())) return;
             channel.pipeline().remove(player.getName());
-            movement_1_21_R6(player);
-        } catch (IllegalAccessException | NoSuchFieldException e) {
+            setupPacketHandler(player, useRepeatingTask, playerConnectionFieldName, networkManagerFieldName, channelFieldName);
+        } catch (Exception e) {
             unexpectedException(e);
         }
     }
+
+    /**
+     * Packet handler for vehicle steering in 1.21.9 and 1.21.10
+     * @param player Player whose steering is being regarded
+     */
+    public static void movement_1_21_R6(Player player) {
+        setupPacketHandler(player, true, "g", "e", "n");
+    }
+
     /**
      * Packet handler for vehicle steering in 1.21.6, 1.21.7 and 1.21.8
      * @param player Player whose steering is being regarded
      */
     public static void movement_1_21_R5(Player player) {
-        ChannelDuplexHandler channelDuplexHandler = new ChannelDuplexHandler() {
-            private net.minecraft.network.protocol.game.PacketPlayInSteerVehicle lastPacket = null;
-            private int taskId = -1;
-
-            public void channelRead(ChannelHandlerContext channelHandlerContext, Object packet) throws Exception {
-                super.channelRead(channelHandlerContext, packet);
-                if (packet instanceof net.minecraft.network.protocol.game.PacketPlayInSteerVehicle) {
-                    net.minecraft.network.protocol.game.PacketPlayInSteerVehicle ppisv = (net.minecraft.network.protocol.game.PacketPlayInSteerVehicle) packet;
-                    lastPacket = ppisv;
-
-                    if (taskId != -1) {
-                        Bukkit.getScheduler().cancelTask(taskId);
-                    }
-
-                    taskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(Main.instance, () -> {
-                        if (player.isInsideVehicle()) {
-                            VehicleMovement movement = new VehicleMovement();
-                            movement.vehicleMovement(player, lastPacket);
-                        } else {
-                            Bukkit.getScheduler().cancelTask(taskId);
-                            taskId = -1;
-                        }
-                    }, 0L, 1L);
-                }
-            }
-        };
-        Channel channel = null;
-        try {
-            Object entityPlayer = ((org.bukkit.craftbukkit.v1_21_R5.entity.CraftPlayer) player).getHandle();
-
-            Field playerConnectionField = entityPlayer.getClass().getField("g");
-            net.minecraft.server.network.PlayerConnection playerConnection = (net.minecraft.server.network.PlayerConnection) playerConnectionField.get(entityPlayer);
-            Field networkManagerField = net.minecraft.server.network.ServerCommonPacketListenerImpl.class.getDeclaredField("e");
-            networkManagerField.setAccessible(true);
-            net.minecraft.network.NetworkManager networkManager = (net.minecraft.network.NetworkManager) networkManagerField.get(playerConnection);
-            Field channelField = networkManager.getClass().getField("n");
-            channel = (Channel) channelField.get(networkManager);
-
-            channel.pipeline()
-                    .addBefore("packet_handler", player.getName(), channelDuplexHandler);
-        } catch (IllegalArgumentException e) { //in case of plugin reload, prevent duplicate handler name exception
-            if (channel == null) {
-                unexpectedException(e);
-                return;
-            }
-            if (!channel.pipeline().names().contains(player.getName())) return;
-            channel.pipeline().remove(player.getName());
-            movement_1_21_R5(player);
-        } catch (IllegalAccessException | NoSuchFieldException e) {
-            unexpectedException(e);
-        }
+        setupPacketHandler(player, true, "g", "e", "n");
     }
+
     /**
      * Packet handler for vehicle steering in 1.21.5
      * @param player Player whose steering is being regarded
      */
     public static void movement_1_21_R4(Player player) {
-        ChannelDuplexHandler channelDuplexHandler = new ChannelDuplexHandler() {
-            private net.minecraft.network.protocol.game.PacketPlayInSteerVehicle lastPacket = null;
-            private int taskId = -1;
-
-            public void channelRead(ChannelHandlerContext channelHandlerContext, Object packet) throws Exception {
-                super.channelRead(channelHandlerContext, packet);
-                if (packet instanceof net.minecraft.network.protocol.game.PacketPlayInSteerVehicle) {
-                    net.minecraft.network.protocol.game.PacketPlayInSteerVehicle ppisv = (net.minecraft.network.protocol.game.PacketPlayInSteerVehicle) packet;
-                    lastPacket = ppisv;
-
-                    if (taskId != -1) {
-                        Bukkit.getScheduler().cancelTask(taskId);
-                    }
-
-                    taskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(Main.instance, () -> {
-                        if (player.isInsideVehicle()) {
-                            VehicleMovement movement = new VehicleMovement();
-                            movement.vehicleMovement(player, lastPacket);
-                        } else {
-                            Bukkit.getScheduler().cancelTask(taskId);
-                            taskId = -1;
-                        }
-                    }, 0L, 1L);
-                }
-            }
-        };
-        Channel channel = null;
-        try {
-            Object entityPlayer = ((org.bukkit.craftbukkit.v1_21_R4.entity.CraftPlayer) player).getHandle();
-
-            Field playerConnectionField = entityPlayer.getClass().getField("f");
-            net.minecraft.server.network.PlayerConnection playerConnection = (net.minecraft.server.network.PlayerConnection) playerConnectionField.get(entityPlayer);
-            Field networkManagerField = net.minecraft.server.network.ServerCommonPacketListenerImpl.class.getDeclaredField("e");
-            networkManagerField.setAccessible(true);
-            net.minecraft.network.NetworkManager networkManager = (net.minecraft.network.NetworkManager) networkManagerField.get(playerConnection);
-            Field channelField = networkManager.getClass().getField("n");
-            channel = (Channel) channelField.get(networkManager);
-
-            channel.pipeline()
-                    .addBefore("packet_handler", player.getName(), channelDuplexHandler);
-        } catch (IllegalArgumentException e) { //in case of plugin reload, prevent duplicate handler name exception
-            if (channel == null) {
-                unexpectedException(e);
-                return;
-            }
-            if (!channel.pipeline().names().contains(player.getName())) return;
-            channel.pipeline().remove(player.getName());
-            movement_1_21_R4(player);
-        } catch (IllegalAccessException | NoSuchFieldException e) {
-            unexpectedException(e);
-        }
+        setupPacketHandler(player, true, "f", "e", "n");
     }
 
     /**
@@ -202,57 +172,7 @@ public class PacketHandler {
      * @param player Player whose steering is being regarded
      */
     public static void movement_1_21_R3(Player player) {
-        ChannelDuplexHandler channelDuplexHandler = new ChannelDuplexHandler() {
-            private net.minecraft.network.protocol.game.PacketPlayInSteerVehicle lastPacket = null;
-            private int taskId = -1;
-
-            public void channelRead(ChannelHandlerContext channelHandlerContext, Object packet) throws Exception {
-                super.channelRead(channelHandlerContext, packet);
-                if (packet instanceof net.minecraft.network.protocol.game.PacketPlayInSteerVehicle) {
-                    net.minecraft.network.protocol.game.PacketPlayInSteerVehicle ppisv = (net.minecraft.network.protocol.game.PacketPlayInSteerVehicle) packet;
-                    lastPacket = ppisv;
-
-                    if (taskId != -1) {
-                        Bukkit.getScheduler().cancelTask(taskId);
-                    }
-
-                    taskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(Main.instance, () -> {
-                        if (player.isInsideVehicle()) {
-                            VehicleMovement movement = new VehicleMovement();
-                            movement.vehicleMovement(player, lastPacket);
-                        } else {
-                            Bukkit.getScheduler().cancelTask(taskId);
-                            taskId = -1;
-                        }
-                    }, 0L, 1L);
-                }
-            }
-        };
-        Channel channel = null;
-        try {
-            Object entityPlayer = ((org.bukkit.craftbukkit.v1_21_R3.entity.CraftPlayer) player).getHandle();
-
-            Field playerConnectionField = entityPlayer.getClass().getField("f");
-            net.minecraft.server.network.PlayerConnection playerConnection = (net.minecraft.server.network.PlayerConnection) playerConnectionField.get(entityPlayer);
-            Field networkManagerField = net.minecraft.server.network.ServerCommonPacketListenerImpl.class.getDeclaredField("e");
-            networkManagerField.setAccessible(true);
-            net.minecraft.network.NetworkManager networkManager = (net.minecraft.network.NetworkManager) networkManagerField.get(playerConnection);
-            Field channelField = networkManager.getClass().getField("n");
-            channel = (Channel) channelField.get(networkManager);
-
-            channel.pipeline()
-                    .addBefore("packet_handler", player.getName(), channelDuplexHandler);
-        } catch (IllegalArgumentException e) { //in case of plugin reload, prevent duplicate handler name exception
-            if (channel == null) {
-                unexpectedException(e);
-                return;
-            }
-            if (!channel.pipeline().names().contains(player.getName())) return;
-            channel.pipeline().remove(player.getName());
-            movement_1_21_R3(player);
-        } catch (IllegalAccessException | NoSuchFieldException e) {
-            unexpectedException(e);
-        }
+        setupPacketHandler(player, true, "f", "e", "n");
     }
 
     /**
@@ -260,57 +180,7 @@ public class PacketHandler {
      * @param player Player whose steering is being regarded
      */
     public static void movement_1_21_R2(Player player) {
-        ChannelDuplexHandler channelDuplexHandler = new ChannelDuplexHandler() {
-            private net.minecraft.network.protocol.game.PacketPlayInSteerVehicle lastPacket = null;
-            private int taskId = -1;
-
-            public void channelRead(ChannelHandlerContext channelHandlerContext, Object packet) throws Exception {
-                super.channelRead(channelHandlerContext, packet);
-                if (packet instanceof net.minecraft.network.protocol.game.PacketPlayInSteerVehicle) {
-                    net.minecraft.network.protocol.game.PacketPlayInSteerVehicle ppisv = (net.minecraft.network.protocol.game.PacketPlayInSteerVehicle) packet;
-                    lastPacket = ppisv;
-
-                    if (taskId != -1) {
-                        Bukkit.getScheduler().cancelTask(taskId);
-                    }
-
-                    taskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(Main.instance, () -> {
-                        if (player.isInsideVehicle()) {
-                            VehicleMovement movement = new VehicleMovement();
-                            movement.vehicleMovement(player, lastPacket);
-                        } else {
-                            Bukkit.getScheduler().cancelTask(taskId);
-                            taskId = -1;
-                        }
-                    }, 0L, 1L);
-                }
-            }
-        };
-        Channel channel = null;
-        try {
-            Object entityPlayer = ((org.bukkit.craftbukkit.v1_21_R2.entity.CraftPlayer) player).getHandle();
-
-            Field playerConnectionField = entityPlayer.getClass().getField("f");
-            net.minecraft.server.network.PlayerConnection playerConnection = (net.minecraft.server.network.PlayerConnection) playerConnectionField.get(entityPlayer);
-            Field networkManagerField = net.minecraft.server.network.ServerCommonPacketListenerImpl.class.getDeclaredField("e");
-            networkManagerField.setAccessible(true);
-            net.minecraft.network.NetworkManager networkManager = (net.minecraft.network.NetworkManager) networkManagerField.get(playerConnection);
-            Field channelField = networkManager.getClass().getField("n");
-            channel = (Channel) channelField.get(networkManager);
-
-            channel.pipeline()
-                    .addBefore("packet_handler", player.getName(), channelDuplexHandler);
-        } catch (IllegalArgumentException e) { //in case of plugin reload, prevent duplicate handler name exception
-            if (channel == null) {
-                unexpectedException(e);
-                return;
-            }
-            if (!channel.pipeline().names().contains(player.getName())) return;
-            channel.pipeline().remove(player.getName());
-            movement_1_21_R2(player);
-        } catch (IllegalAccessException | NoSuchFieldException e) {
-            unexpectedException(e);
-        }
+        setupPacketHandler(player, true, "f", "e", "n");
     }
 
     /**
@@ -318,84 +188,15 @@ public class PacketHandler {
      * @param player Player whose steering is being regarded
      */
     public static void movement_1_21_R1(Player player) {
-        ChannelDuplexHandler channelDuplexHandler = new ChannelDuplexHandler() {
-            public void channelRead(ChannelHandlerContext channelHandlerContext, Object packet) throws Exception {
-                super.channelRead(channelHandlerContext, packet);
-                if (packet instanceof net.minecraft.network.protocol.game.PacketPlayInSteerVehicle) {
-                    net.minecraft.network.protocol.game.PacketPlayInSteerVehicle ppisv = (net.minecraft.network.protocol.game.PacketPlayInSteerVehicle) packet;
-                    VehicleMovement movement = new VehicleMovement();
-                    movement.vehicleMovement(player, ppisv);
-                }
-            }
-        };
-        Channel channel = null;
-        try {
-            Object entityPlayer = ((org.bukkit.craftbukkit.v1_21_R1.entity.CraftPlayer) player).getHandle();
-
-            Field playerConnectionField = entityPlayer.getClass().getField("c");
-            net.minecraft.server.network.PlayerConnection playerConnection = (net.minecraft.server.network.PlayerConnection) playerConnectionField.get(entityPlayer);
-            Field networkManagerField = net.minecraft.server.network.ServerCommonPacketListenerImpl.class.getDeclaredField("e");
-            networkManagerField.setAccessible(true);
-            net.minecraft.network.NetworkManager networkManager = (net.minecraft.network.NetworkManager) networkManagerField.get(playerConnection);
-            Field channelField = networkManager.getClass().getField("n");
-            channel = (Channel) channelField.get(networkManager);
-
-            channel.pipeline()
-                    .addBefore("packet_handler", player.getName(), channelDuplexHandler);
-        } catch (IllegalArgumentException e) { //in case of plugin reload, prevent duplicate handler name exception
-            if (channel == null) {
-                unexpectedException(e);
-                return;
-            }
-            if (!channel.pipeline().names().contains(player.getName())) return;
-            channel.pipeline().remove(player.getName());
-            movement_1_21_R1(player);
-        } catch (IllegalAccessException | NoSuchFieldException e) {
-            unexpectedException(e);
-        }
+        setupPacketHandler(player, false, "c", "e", "n");
     }
-
 
     /**
      * Packet handler for vehicle steering in 1.20.5 and 1.20.6
      * @param player Player whose steering is being regarded
      */
     public static void movement_1_20_R4(Player player) {
-        ChannelDuplexHandler channelDuplexHandler = new ChannelDuplexHandler() {
-            public void channelRead(ChannelHandlerContext channelHandlerContext, Object packet) throws Exception {
-                super.channelRead(channelHandlerContext, packet);
-                if (packet instanceof net.minecraft.network.protocol.game.PacketPlayInSteerVehicle) {
-                    net.minecraft.network.protocol.game.PacketPlayInSteerVehicle ppisv = (net.minecraft.network.protocol.game.PacketPlayInSteerVehicle) packet;
-                    VehicleMovement movement = new VehicleMovement();
-                    movement.vehicleMovement(player, ppisv);
-                }
-            }
-        };
-        Channel channel = null;
-        try {
-            Object entityPlayer = ((org.bukkit.craftbukkit.v1_20_R4.entity.CraftPlayer) player).getHandle();
-
-            Field playerConnectionField = entityPlayer.getClass().getField("c");
-            net.minecraft.server.network.PlayerConnection playerConnection = (net.minecraft.server.network.PlayerConnection) playerConnectionField.get(entityPlayer);
-            Field networkManagerField = net.minecraft.server.network.ServerCommonPacketListenerImpl.class.getDeclaredField("e");
-            networkManagerField.setAccessible(true);
-            net.minecraft.network.NetworkManager networkManager = (net.minecraft.network.NetworkManager) networkManagerField.get(playerConnection);
-            Field channelField = networkManager.getClass().getField("n");
-            channel = (Channel) channelField.get(networkManager);
-
-            channel.pipeline()
-                    .addBefore("packet_handler", player.getName(), channelDuplexHandler);
-        } catch (IllegalArgumentException e) { //in case of plugin reload, prevent duplicate handler name exception
-            if (channel == null) {
-                unexpectedException(e);
-                return;
-            }
-            if (!channel.pipeline().names().contains(player.getName())) return;
-            channel.pipeline().remove(player.getName());
-            movement_1_20_R4(player);
-        } catch (IllegalAccessException | NoSuchFieldException e) {
-            unexpectedException(e);
-        }
+        setupPacketHandler(player, false, "c", "e", "n");
     }
 
     /**
@@ -403,42 +204,7 @@ public class PacketHandler {
      * @param player Player whose steering is being regarded
      */
     public static void movement_1_20_R3(Player player) {
-        ChannelDuplexHandler channelDuplexHandler = new ChannelDuplexHandler() {
-            public void channelRead(ChannelHandlerContext channelHandlerContext, Object packet) throws Exception {
-                super.channelRead(channelHandlerContext, packet);
-                if (packet instanceof net.minecraft.network.protocol.game.PacketPlayInSteerVehicle) {
-                    net.minecraft.network.protocol.game.PacketPlayInSteerVehicle ppisv = (net.minecraft.network.protocol.game.PacketPlayInSteerVehicle) packet;
-                    VehicleMovement movement = new VehicleMovement();
-                    movement.vehicleMovement(player, ppisv);
-                }
-            }
-        };
-        Channel channel = null;
-        try {
-            Object entityPlayer = ((org.bukkit.craftbukkit.v1_20_R3.entity.CraftPlayer) player).getHandle();
-
-            Field playerConnectionField = entityPlayer.getClass().getField("c");
-            playerConnectionField.setAccessible(true);
-            net.minecraft.server.network.PlayerConnection playerConnection = (net.minecraft.server.network.PlayerConnection) playerConnectionField.get(entityPlayer);
-            Field networkManagerField = net.minecraft.server.network.ServerCommonPacketListenerImpl.class.getDeclaredField("c");
-            networkManagerField.setAccessible(true);
-            net.minecraft.network.NetworkManager networkManager = (net.minecraft.network.NetworkManager) networkManagerField.get(playerConnection);
-            Field channelField = networkManager.getClass().getField("n");
-            channel = (Channel) channelField.get(networkManager);
-
-            channel.pipeline()
-                    .addBefore("packet_handler", player.getName(), channelDuplexHandler);
-        } catch (IllegalArgumentException e) { //in case of plugin reload, prevent duplicate handler name exception
-            if (channel == null) {
-                unexpectedException(e);
-                return;
-            }
-            if (!channel.pipeline().names().contains(player.getName())) return;
-            channel.pipeline().remove(player.getName());
-            movement_1_20_R3(player);
-        } catch (IllegalAccessException | NoSuchFieldException e) {
-            unexpectedException(e);
-        }
+        setupPacketHandler(player, false, "c", "c", "n");
     }
 
     /**
@@ -446,83 +212,15 @@ public class PacketHandler {
      * @param player Player whose steering is being regarded
      */
     public static void movement_1_20_R2(Player player) {
-        ChannelDuplexHandler channelDuplexHandler = new ChannelDuplexHandler() {
-            public void channelRead(ChannelHandlerContext channelHandlerContext, Object packet) throws Exception {
-                super.channelRead(channelHandlerContext, packet);
-                if (packet instanceof net.minecraft.network.protocol.game.PacketPlayInSteerVehicle) {
-                    net.minecraft.network.protocol.game.PacketPlayInSteerVehicle ppisv = (net.minecraft.network.protocol.game.PacketPlayInSteerVehicle) packet;
-                    VehicleMovement movement = new VehicleMovement();
-                    movement.vehicleMovement(player, ppisv);
-                }
-            }
-        };
-        Channel channel = null;
-        try {
-            Object entityPlayer = ((org.bukkit.craftbukkit.v1_20_R2.entity.CraftPlayer) player).getHandle();
-
-            Field playerConnectionField = entityPlayer.getClass().getField("c");
-            net.minecraft.server.network.PlayerConnection playerConnection = (net.minecraft.server.network.PlayerConnection) playerConnectionField.get(entityPlayer);
-            Field networkManagerField = net.minecraft.server.network.ServerCommonPacketListenerImpl.class.getDeclaredField("c");
-            networkManagerField.setAccessible(true);
-            net.minecraft.network.NetworkManager networkManager = (net.minecraft.network.NetworkManager) networkManagerField.get(playerConnection);
-            Field channelField = networkManager.getClass().getField("n");
-            channel = (Channel) channelField.get(networkManager);
-
-            channel.pipeline()
-                    .addBefore("packet_handler", player.getName(), channelDuplexHandler);
-        } catch (IllegalArgumentException e) { //in case of plugin reload, prevent duplicate handler name exception
-            if (channel == null) {
-                unexpectedException(e);
-                return;
-            }
-            if (!channel.pipeline().names().contains(player.getName())) return;
-            channel.pipeline().remove(player.getName());
-            movement_1_20_R2(player);
-        } catch (IllegalAccessException | NoSuchFieldException e) {
-            unexpectedException(e);
-        }
+        setupPacketHandler(player, false, "c", "c", "n");
     }
 
     /**
       * Packet handler for vehicle steering in 1.20 and 1.20.1
       * @param player Player whose steering is being regarded
       */
-      public static void movement_1_20_R1(Player player) {
-        ChannelDuplexHandler channelDuplexHandler = new ChannelDuplexHandler() {
-            public void channelRead(ChannelHandlerContext channelHandlerContext, Object packet) throws Exception {
-                super.channelRead(channelHandlerContext, packet);
-                if (packet instanceof net.minecraft.network.protocol.game.PacketPlayInSteerVehicle) {
-                    net.minecraft.network.protocol.game.PacketPlayInSteerVehicle ppisv = (net.minecraft.network.protocol.game.PacketPlayInSteerVehicle) packet;
-                    VehicleMovement movement = new VehicleMovement();
-                    movement.vehicleMovement(player, ppisv);
-                }
-            }
-        };
-        Channel channel = null;
-        try {
-            Object entityPlayer = ((org.bukkit.craftbukkit.v1_20_R1.entity.CraftPlayer) player).getHandle();
-
-            Field playerConnectionField = entityPlayer.getClass().getField("c");
-            net.minecraft.server.network.PlayerConnection playerConnection = (net.minecraft.server.network.PlayerConnection) playerConnectionField.get(entityPlayer);
-            Field networkManagerField = playerConnection.getClass().getDeclaredField("h");
-            networkManagerField.setAccessible(true);
-            net.minecraft.network.NetworkManager networkManager = (net.minecraft.network.NetworkManager) networkManagerField.get(playerConnection);
-            Field channelField = networkManager.getClass().getField("m");
-            channel = (Channel) channelField.get(networkManager);
-
-            channel.pipeline()
-                    .addBefore("packet_handler", player.getName(), channelDuplexHandler);
-        } catch (IllegalArgumentException e) { //in case of plugin reload, prevent duplicate handler name exception
-            if (channel == null) {
-                unexpectedException(e);
-                return;
-            }
-            if (!channel.pipeline().names().contains(player.getName())) return;
-            channel.pipeline().remove(player.getName());
-            movement_1_20_R1(player);
-        } catch (IllegalAccessException | NoSuchFieldException e) {
-            unexpectedException(e);
-        }
+    public static void movement_1_20_R1(Player player) {
+        setupPacketHandler(player, false, "c", "h", "m");
     }
 
     /**
@@ -530,40 +228,7 @@ public class PacketHandler {
      * @param player Player whose steering is being regarded
      */
     public static void movement_1_19_R3(Player player) {
-        ChannelDuplexHandler channelDuplexHandler = new ChannelDuplexHandler() {
-            public void channelRead(ChannelHandlerContext channelHandlerContext, Object packet) throws Exception {
-                super.channelRead(channelHandlerContext, packet);
-                if (packet instanceof net.minecraft.network.protocol.game.PacketPlayInSteerVehicle) {
-                    net.minecraft.network.protocol.game.PacketPlayInSteerVehicle ppisv = (net.minecraft.network.protocol.game.PacketPlayInSteerVehicle) packet;
-                    VehicleMovement movement = new VehicleMovement();
-                    movement.vehicleMovement(player, ppisv);
-                }
-            }
-        };
-        Channel channel = null;
-        try {
-            Object entityPlayer = ((org.bukkit.craftbukkit.v1_19_R3.entity.CraftPlayer) player).getHandle();
-            Field playerConnectionField = entityPlayer.getClass().getField("b");
-            net.minecraft.server.network.PlayerConnection playerConnection = (net.minecraft.server.network.PlayerConnection) playerConnectionField.get(entityPlayer);
-            Field networkManagerField = playerConnection.getClass().getDeclaredField("h");
-            networkManagerField.setAccessible(true);
-            net.minecraft.network.NetworkManager networkManager = (net.minecraft.network.NetworkManager) networkManagerField.get(playerConnection);
-            Field channelField = networkManager.getClass().getField("m");
-            channel = (Channel) channelField.get(networkManager);
-
-            channel.pipeline()
-                    .addBefore("packet_handler", player.getName(), channelDuplexHandler);
-        } catch (IllegalArgumentException e) { //in case of plugin reload, prevent duplicate handler name exception
-            if (channel == null) {
-                unexpectedException(e);
-                return;
-            }
-            if (!channel.pipeline().names().contains(player.getName())) return;
-            channel.pipeline().remove(player.getName());
-            movement_1_19_R3(player);
-        } catch (IllegalAccessException | NoSuchFieldException e) {
-            unexpectedException(e);
-        }
+        setupPacketHandler(player, false, "b", "h", "m");
     }
 
     /**
@@ -571,39 +236,7 @@ public class PacketHandler {
      * @param player Player whose steering is being regarded
      */
     public static void movement_1_19_R2(Player player) {
-        ChannelDuplexHandler channelDuplexHandler = new ChannelDuplexHandler() {
-            public void channelRead(ChannelHandlerContext channelHandlerContext, Object packet) throws Exception {
-                super.channelRead(channelHandlerContext, packet);
-                if (packet instanceof net.minecraft.network.protocol.game.PacketPlayInSteerVehicle) {
-                    net.minecraft.network.protocol.game.PacketPlayInSteerVehicle ppisv = (net.minecraft.network.protocol.game.PacketPlayInSteerVehicle) packet;
-                    VehicleMovement movement = new VehicleMovement();
-                    movement.vehicleMovement(player, ppisv);
-                }
-            }
-        };
-        Channel channel = null;
-        try {
-            Object entityPlayer = ((org.bukkit.craftbukkit.v1_19_R2.entity.CraftPlayer) player).getHandle();
-            Field playerConnectionField = entityPlayer.getClass().getField("b");
-            net.minecraft.server.network.PlayerConnection playerConnection = (net.minecraft.server.network.PlayerConnection) playerConnectionField.get(entityPlayer);
-            Field networkManagerField = playerConnection.getClass().getField("b");
-            net.minecraft.network.NetworkManager networkManager = (net.minecraft.network.NetworkManager) networkManagerField.get(playerConnection);
-            Field channelField = networkManager.getClass().getField("m");
-            channel = (Channel) channelField.get(networkManager);
-
-            channel.pipeline()
-                    .addBefore("packet_handler", player.getName(), channelDuplexHandler);
-        } catch (IllegalArgumentException e) { //in case of plugin reload, prevent duplicate handler name exception
-            if (channel == null) {
-                unexpectedException(e);
-                return;
-            }
-            if (!channel.pipeline().names().contains(player.getName())) return;
-            channel.pipeline().remove(player.getName());
-            movement_1_19_R2(player);
-        } catch (IllegalAccessException | NoSuchFieldException e) {
-            unexpectedException(e);
-        }
+        setupPacketHandler(player, false, "b", "b", "m");
     }
 
     /**
@@ -611,39 +244,7 @@ public class PacketHandler {
      * @param player Player whose steering is being regarded
      */
     public static void movement_1_19_R1(Player player) {
-        ChannelDuplexHandler channelDuplexHandler = new ChannelDuplexHandler() {
-            public void channelRead(ChannelHandlerContext channelHandlerContext, Object packet) throws Exception {
-                super.channelRead(channelHandlerContext, packet);
-                if (packet instanceof net.minecraft.network.protocol.game.PacketPlayInSteerVehicle) {
-                    net.minecraft.network.protocol.game.PacketPlayInSteerVehicle ppisv = (net.minecraft.network.protocol.game.PacketPlayInSteerVehicle) packet;
-                    VehicleMovement movement = new VehicleMovement();
-                    movement.vehicleMovement(player, ppisv);
-                }
-            }
-        };
-        Channel channel = null;
-        try {
-            Object entityPlayer = ((org.bukkit.craftbukkit.v1_19_R1.entity.CraftPlayer) player).getHandle();
-            Field playerConnectionField = entityPlayer.getClass().getField("b");
-            net.minecraft.server.network.PlayerConnection playerConnection = (net.minecraft.server.network.PlayerConnection) playerConnectionField.get(entityPlayer);
-            Field networkManagerField = playerConnection.getClass().getField("b");
-            net.minecraft.network.NetworkManager networkManager = (net.minecraft.network.NetworkManager) networkManagerField.get(playerConnection);
-            Field channelField = networkManager.getClass().getField("m");
-            channel = (Channel) channelField.get(networkManager);
-
-            channel.pipeline()
-                    .addBefore("packet_handler", player.getName(), channelDuplexHandler);
-        } catch (IllegalArgumentException e) { //in case of plugin reload, prevent duplicate handler name exception
-            if (channel == null) {
-                unexpectedException(e);
-                return;
-            }
-            if (!channel.pipeline().names().contains(player.getName())) return;
-            channel.pipeline().remove(player.getName());
-            movement_1_19_R1(player);
-        } catch (IllegalAccessException | NoSuchFieldException e) {
-            unexpectedException(e);
-        }
+        setupPacketHandler(player, false, "b", "b", "m");
     }
 
     /**
@@ -651,37 +252,7 @@ public class PacketHandler {
      * @param player Player whose steering is being regarded
      */
     public static void movement_1_18_R2(Player player) {
-        ChannelDuplexHandler channelDuplexHandler = new ChannelDuplexHandler() {
-            public void channelRead(ChannelHandlerContext channelHandlerContext, Object packet) throws Exception {
-                super.channelRead(channelHandlerContext, packet);
-                if (packet instanceof net.minecraft.network.protocol.game.PacketPlayInSteerVehicle) {
-                    net.minecraft.network.protocol.game.PacketPlayInSteerVehicle ppisv = (net.minecraft.network.protocol.game.PacketPlayInSteerVehicle) packet;
-                    VehicleMovement movement = new VehicleMovement();
-                    movement.vehicleMovement(player, ppisv);
-                }
-            }
-        };
-        Channel channel = null;
-        try {
-            Object networkManager = ((org.bukkit.craftbukkit.v1_18_R2.entity.CraftPlayer) player).getHandle().b.a;
-            Field channelField = networkManager.getClass().getField("m");
-            channel = (Channel) channelField.get(networkManager);
-
-            channel.pipeline()
-                    .addBefore("packet_handler", player.getName(), channelDuplexHandler);
-        } catch (IllegalArgumentException e) { //in case of plugin reload, prevent duplicate handler name exception
-            if (channel == null) {
-                unexpectedException(e);
-                return;
-            }
-            if (!channel.pipeline().names().contains(player.getName())) return;
-            channel.pipeline().remove(player.getName());
-            movement_1_18_R2(player);
-        } catch (NoSuchElementException e) {
-            //It isn't good practice to ignore exceptions, but I'll keep it like this for now :)
-        } catch (IllegalAccessException | NoSuchFieldException e) {
-            unexpectedException(e);
-        }
+        setupPacketHandler(player, false, "b", "a", "m");
     }
 
     /**
@@ -689,32 +260,7 @@ public class PacketHandler {
      * @param player Player whose steering is being regarded
      */
     public static void movement_1_18_R1(Player player) {
-        ChannelDuplexHandler channelDuplexHandler = new ChannelDuplexHandler() {
-            public void channelRead(ChannelHandlerContext channelHandlerContext, Object packet) throws Exception {
-                super.channelRead(channelHandlerContext, packet);
-                if (packet instanceof net.minecraft.network.protocol.game.PacketPlayInSteerVehicle) {
-                    net.minecraft.network.protocol.game.PacketPlayInSteerVehicle ppisv = (net.minecraft.network.protocol.game.PacketPlayInSteerVehicle) packet;
-                    VehicleMovement movement = new VehicleMovement();
-                    movement.vehicleMovement(player, ppisv);
-                }
-            }
-        };
-        Channel channel = null;
-        try {
-            channel = ((org.bukkit.craftbukkit.v1_18_R1.entity.CraftPlayer) player).getHandle().b.a.k; // #wtf
-            channel.pipeline()
-                    .addBefore("packet_handler", player.getName(), channelDuplexHandler);
-        } catch (IllegalArgumentException e) { //in case of plugin reload, prevent duplicate handler name exception
-            if (channel == null) {
-                unexpectedException(e);
-                return;
-            }
-            if (!channel.pipeline().names().contains(player.getName())) return;
-            channel.pipeline().remove(player.getName());
-            movement_1_18_R1(player);
-        } catch (NoSuchElementException e) {
-            //It isn't good practice to ignore exceptions, but I'll keep it like this for now :)
-        }
+        setupPacketHandler(player, false, "b", "a", "k");
     }
 
     /**
@@ -722,32 +268,7 @@ public class PacketHandler {
      * @param player Player whose steering is being regarded
      */
     public static void movement_1_17_R1(Player player) {
-        ChannelDuplexHandler channelDuplexHandler = new ChannelDuplexHandler() {
-            public void channelRead(ChannelHandlerContext channelHandlerContext, Object packet) throws Exception {
-                super.channelRead(channelHandlerContext, packet);
-                if (packet instanceof net.minecraft.network.protocol.game.PacketPlayInSteerVehicle) {
-                    net.minecraft.network.protocol.game.PacketPlayInSteerVehicle ppisv = (net.minecraft.network.protocol.game.PacketPlayInSteerVehicle) packet;
-                    VehicleMovement movement = new VehicleMovement();
-                    movement.vehicleMovement(player, ppisv);
-                }
-            }
-        };
-        Channel channel = null;
-        try {
-            channel = ((org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer) player).getHandle().b.a.k; // #wtf
-            channel.pipeline()
-                    .addBefore("packet_handler", player.getName(), channelDuplexHandler);
-        } catch (IllegalArgumentException e) { //in case of plugin reload, prevent duplicate handler name exception
-            if (channel == null) {
-                unexpectedException(e);
-                return;
-            }
-            if (!channel.pipeline().names().contains(player.getName())) return;
-            channel.pipeline().remove(player.getName());
-            movement_1_17_R1(player);
-        } catch (NoSuchElementException e) {
-            //It isn't good practice to ignore exceptions, but I'll keep it like this for now :)
-        }
+        setupPacketHandler(player, false, "b", "a", "k");
     }
 
     /**
@@ -755,33 +276,7 @@ public class PacketHandler {
      * @param player Player whose steering is being regarded
      */
     public static void movement_1_16_R3(Player player) {
-        ChannelDuplexHandler channelDuplexHandler = new ChannelDuplexHandler() {
-            @Override
-            public void channelRead(ChannelHandlerContext channelHandlerContext, Object packet) throws Exception {
-                super.channelRead(channelHandlerContext, packet);
-                if (packet instanceof net.minecraft.server.v1_16_R3.PacketPlayInSteerVehicle) {
-                    net.minecraft.server.v1_16_R3.PacketPlayInSteerVehicle ppisv = (net.minecraft.server.v1_16_R3.PacketPlayInSteerVehicle) packet;
-                    VehicleMovement movement = new VehicleMovement();
-                    movement.vehicleMovement(player, ppisv);
-                }
-            }
-        };
-        Channel channel = null;
-        try {
-            channel = ((org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer) player).getHandle().playerConnection.networkManager.channel;
-            channel.pipeline()
-                    .addBefore("packet_handler", player.getName(), channelDuplexHandler);
-        } catch (IllegalArgumentException e) { //in case of plugin reload, prevent duplicate handler name exception
-            if (channel == null) {
-                unexpectedException(e);
-                return;
-            }
-            if (!channel.pipeline().names().contains(player.getName())) return;
-            channel.pipeline().remove(player.getName());
-            movement_1_16_R3(player);
-        } catch (NoSuchElementException e) {
-            //It isn't good practice to ignore exceptions, but I'll keep it like this for now :)
-        }
+        setupPacketHandler(player, false, "playerConnection", "networkManager", "channel");
     }
 
     /**
@@ -789,33 +284,7 @@ public class PacketHandler {
      * @param player Player whose steering is being regarded
      */
     public static void movement_1_15_R1(Player player) {
-        ChannelDuplexHandler channelDuplexHandler = new ChannelDuplexHandler() {
-            @Override
-            public void channelRead(ChannelHandlerContext channelHandlerContext, Object packet) throws Exception {
-                super.channelRead(channelHandlerContext, packet);
-                if (packet instanceof net.minecraft.server.v1_15_R1.PacketPlayInSteerVehicle) {
-                    net.minecraft.server.v1_15_R1.PacketPlayInSteerVehicle ppisv = (net.minecraft.server.v1_15_R1.PacketPlayInSteerVehicle) packet;
-                    VehicleMovement movement = new VehicleMovement();
-                    movement.vehicleMovement(player, ppisv);
-                }
-            }
-        };
-        Channel channel = null;
-        try {
-            channel = ((org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer) player).getHandle().playerConnection.networkManager.channel;
-            channel.pipeline()
-                    .addBefore("packet_handler", player.getName(), channelDuplexHandler);
-        } catch (IllegalArgumentException e) { //in case of plugin reload, prevent duplicate handler name exception
-            if (channel == null) {
-                unexpectedException(e);
-                return;
-            }
-            if (!channel.pipeline().names().contains(player.getName())) return;
-            channel.pipeline().remove(player.getName());
-            movement_1_15_R1(player);
-        } catch (NoSuchElementException e) {
-            //It isn't good practice to ignore exceptions, but I'll keep it like this for now :)
-        }
+        setupPacketHandler(player, false, "playerConnection", "networkManager", "channel");
     }
 
     /**
@@ -823,33 +292,7 @@ public class PacketHandler {
      * @param player Player whose steering is being regarded
      */
     public static void movement_1_13_R2(Player player) {
-        ChannelDuplexHandler channelDuplexHandler = new ChannelDuplexHandler() {
-            @Override
-            public void channelRead(ChannelHandlerContext channelHandlerContext, Object packet) throws Exception {
-                super.channelRead(channelHandlerContext, packet);
-                if (packet instanceof net.minecraft.server.v1_13_R2.PacketPlayInSteerVehicle) {
-                    net.minecraft.server.v1_13_R2.PacketPlayInSteerVehicle ppisv = (net.minecraft.server.v1_13_R2.PacketPlayInSteerVehicle) packet;
-                    VehicleMovement movement = new VehicleMovement();
-                    movement.vehicleMovement(player, ppisv);
-                }
-            }
-        };
-        Channel channel = null;
-        try {
-            channel = ((org.bukkit.craftbukkit.v1_13_R2.entity.CraftPlayer) player).getHandle().playerConnection.networkManager.channel;
-            channel.pipeline()
-                    .addBefore("packet_handler", player.getName(), channelDuplexHandler);
-        } catch (IllegalArgumentException e) { //in case of plugin reload, prevent duplicate handler name exception
-            if (channel == null) {
-                unexpectedException(e);
-                return;
-            }
-            if (!channel.pipeline().names().contains(player.getName())) return;
-            channel.pipeline().remove(player.getName());
-            movement_1_13_R2(player);
-        } catch (NoSuchElementException e) {
-            //It isn't good practice to ignore exceptions, but I'll keep it like this for now :)
-        }
+        setupPacketHandler(player, false, "playerConnection", "networkManager", "channel");
     }
 
     /**
@@ -857,41 +300,7 @@ public class PacketHandler {
      * @param player Player whose steering is being regarded
      */
     public static void movement_1_12_R1(Player player) {
-        ChannelDuplexHandler channelDuplexHandler = new ChannelDuplexHandler() {
-            @Override
-            public void channelRead(ChannelHandlerContext channelHandlerContext, Object packet) throws Exception {
-                super.channelRead(channelHandlerContext, packet);
-                if (packet instanceof net.minecraft.server.v1_12_R1.PacketPlayInSteerVehicle) {
-                    net.minecraft.server.v1_12_R1.PacketPlayInSteerVehicle ppisv = (net.minecraft.server.v1_12_R1.PacketPlayInSteerVehicle) packet;
-                    VehicleMovement1_12 movement = new VehicleMovement1_12();
-                    movement.vehicleMovement(player, ppisv);
-                }
-            }
-        };
-        Channel channel = null;
-        try {
-            channel = ((org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer) player).getHandle().playerConnection.networkManager.channel;
-            channel.pipeline()
-                    .addBefore("packet_handler", player.getName(), channelDuplexHandler);
-        } catch (IllegalArgumentException e) { //in case of plugin reload, prevent duplicate handler name exception
-            if (channel == null) {
-                unexpectedException(e);
-                return;
-            }
-            if (!channel.pipeline().names().contains(player.getName())) return;
-            channel.pipeline().remove(player.getName());
-            movement_1_12_R1(player);
-        } catch (NoSuchElementException e) {
-            //It isn't good practice to ignore exceptions, but I'll keep it like this for now :)
-        }
-    }
-
-    /**
-     * Log an error message and disable the plugin.
-     */
-    private static void unexpectedException(){
-        Main.logSevere("An unexpected error occurred. Disabling the plugin...");
-        Main.disablePlugin();
+        setupPacketHandler(player, false, "playerConnection", "networkManager", "channel");
     }
 
     /**
