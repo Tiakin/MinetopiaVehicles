@@ -32,7 +32,7 @@ public class Main extends JavaPlugin {
      * This variable works exactly as {@link #configVersion}.
      */
 
-    final public static String messagesVersion = "2.5.8-dev2";
+    final public static String messagesVersion = "2.5.8-dev7";
 
     @Override
     public void onEnable() {
@@ -44,7 +44,7 @@ public class Main extends JavaPlugin {
         logInfo("Plugin has been loaded!");
         if (VersionModule.isPreRelease) logWarning("Be aware: You are using a pre-release. It might not be stable and it's generally not advised to use it on a production server.");
         logInfo("--------------------------");
-        logInfo("Welcome by MTVehicles v" + VersionModule.pluginVersionString + "!");
+        logInfo("Welcome by MTVehicles v" + VersionModule.getPluginVersion() + "!");
         logInfo("Thanks for using our plugin.");
         logInfo("--------------------------");
 

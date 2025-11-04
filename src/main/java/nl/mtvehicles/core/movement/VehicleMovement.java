@@ -714,6 +714,7 @@ public class VehicleMovement {
         else if (getServerVersion().is1_21_R3()) teleportSeat(((org.bukkit.craftbukkit.v1_21_R3.entity.CraftEntity) seat).getHandle(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
         else if (getServerVersion().is1_21_R4()) teleportSeat(((org.bukkit.craftbukkit.v1_21_R4.entity.CraftEntity) seat).getHandle(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
         else if (getServerVersion().is1_21_R5()) teleportSeat(((org.bukkit.craftbukkit.v1_21_R5.entity.CraftEntity) seat).getHandle(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
+        else if (getServerVersion().is1_21_R6()) teleportSeat(((org.bukkit.craftbukkit.v1_21_R6.entity.CraftEntity) seat).getHandle(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
     }
 
     /**

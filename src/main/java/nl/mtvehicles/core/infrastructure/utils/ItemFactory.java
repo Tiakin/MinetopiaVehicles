@@ -272,22 +272,6 @@ public class ItemFactory {
         return this.skullOwner;
     }
 
-    /**
-     * @deprecated Use {@link #setSkullOwner(OfflinePlayer)} instead.
-     */
-    @Deprecated
-    public ItemFactory setSkullOwner(String owner) {
-        try {
-            SkullMeta im = (SkullMeta) this.item.getItemMeta();
-            im.setOwner(owner);
-            this.item.setItemMeta(im);
-        } catch (ClassCastException e) {
-            Main.logSevere("Cannot use ItemFactory#setSkullOwner(String) on given item!");
-            e.printStackTrace();
-        }
-        return this;
-    }
-
     public ItemFactory setSkullOwner(OfflinePlayer owner) {
         try {
             SkullMeta im = (SkullMeta) this.item.getItemMeta();

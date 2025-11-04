@@ -72,13 +72,13 @@ public class MenuUtils {
 
         MessagesConfig msg = ConfigModule.messagesConfig;
 
-        inv.setItem(10, ItemUtils.getMenuCustomItem(ItemUtils.getMaterial(skinItem), "&6" + msg.getMessage(Message.EDIT_NAME), skinDamage, String.format("&7%s: &e%s", msg.getMessage(Message.CURRENTLY), name)));
-        inv.setItem(13, ItemUtils.getMenuItem(Material.PAPER, 1, "&6" + msg.getMessage(Message.EDIT_LICENSE_PLATE), String.format("&7%s: &e%s", msg.getMessage(Message.CURRENTLY), licensePlate)));
+        inv.setItem(10, ItemUtils.getMenuCustomItem(ItemUtils.getMaterial(skinItem), "&6" + msg.getMessage(Message.EDIT_NAME), skinDamage, String.format("&7%s &e%s", msg.getMessage(Message.CURRENTLY), name)));
+        inv.setItem(13, ItemUtils.getMenuItem(Material.PAPER, 1, "&6" + msg.getMessage(Message.EDIT_LICENSE_PLATE), String.format("&7%s &e%s", msg.getMessage(Message.CURRENTLY), licensePlate)));
         if (isGlowing)
-            //inv.setItem(16, ItemUtils.glowItem("BOOK", "&6" + msg.getMessage(Message.TOGGLE_GLOW), String.format("&7%s: &e%s", msg.getMessage(Message.CURRENTLY), msg.getMessage(Message.TURNED_ON))));
-            inv.setItem(16, ItemUtils.getMenuGlowingItem(Material.BOOK, 1, "&6" + msg.getMessage(Message.TOGGLE_GLOW), String.format("&7%s: &e%s", msg.getMessage(Message.CURRENTLY), msg.getMessage(Message.TURNED_ON))));
+            //inv.setItem(16, ItemUtils.glowItem("BOOK", "&6" + msg.getMessage(Message.TOGGLE_GLOW), String.format("&7%s &e%s", msg.getMessage(Message.CURRENTLY), msg.getMessage(Message.TURNED_ON))));
+            inv.setItem(16, ItemUtils.getMenuGlowingItem(Material.BOOK, 1, "&6" + msg.getMessage(Message.TOGGLE_GLOW), String.format("&7%s &e%s", msg.getMessage(Message.CURRENTLY), msg.getMessage(Message.TURNED_ON))));
         else
-            inv.setItem(16, ItemUtils.getMenuItem(Material.BOOK, 1, "&6" + msg.getMessage(Message.TOGGLE_GLOW), String.format("&7%s: &e%s", msg.getMessage(Message.CURRENTLY), msg.getMessage(Message.TURNED_OFF))));
+            inv.setItem(16, ItemUtils.getMenuItem(Material.BOOK, 1, "&6" + msg.getMessage(Message.TOGGLE_GLOW), String.format("&7%s &e%s", msg.getMessage(Message.CURRENTLY), msg.getMessage(Message.TURNED_OFF))));
         DrawOptions(p, inv);
     }
 
@@ -113,11 +113,11 @@ public class MenuUtils {
 
         ItemStack option1;
         if ((boolean) ConfigModule.vehicleDataConfig.get(licensePlate, VehicleDataConfig.Option.FUEL_ENABLED))
-            option1 = ItemUtils.getMenuCustomItem(Material.DIAMOND_HOE,  "&6" + msg.getMessage(Message.TOGGLE_FUEL), 58, String.format("&7%s: &e%s", msg.getMessage(Message.CURRENTLY), msg.getMessage(Message.TURNED_ON)));
+            option1 = ItemUtils.getMenuCustomItem(Material.DIAMOND_HOE,  "&6" + msg.getMessage(Message.TOGGLE_FUEL), 58, String.format("&7%s &e%s", msg.getMessage(Message.CURRENTLY), msg.getMessage(Message.TURNED_ON)));
         else
-            option1 = ItemUtils.getMenuCustomItem(Material.DIAMOND_HOE, "&6" + msg.getMessage(Message.TOGGLE_FUEL), 58, String.format("&7%s: &e%s", msg.getMessage(Message.CURRENTLY), msg.getMessage(Message.TURNED_OFF)));
-        ItemStack option2 = ItemUtils.getMenuCustomItem(Material.DIAMOND_HOE, "&6" + msg.getMessage(Message.CURRENT_FUEL), 58, String.format("&7%s: &e%s", msg.getMessage(Message.CURRENTLY), vehicle.getFuel()));
-        ItemStack option3 = ItemUtils.getMenuCustomItem(Material.DIAMOND_HOE, "&6" + msg.getMessage(Message.FUEL_USAGE), 58, String.format("&7%s: &e%s", msg.getMessage(Message.CURRENTLY), vehicle.getFuelUsage()));
+            option1 = ItemUtils.getMenuCustomItem(Material.DIAMOND_HOE, "&6" + msg.getMessage(Message.TOGGLE_FUEL), 58, String.format("&7%s &e%s", msg.getMessage(Message.CURRENTLY), msg.getMessage(Message.TURNED_OFF)));
+        ItemStack option2 = ItemUtils.getMenuCustomItem(Material.DIAMOND_HOE, "&6" + msg.getMessage(Message.CURRENT_FUEL), 58, String.format("&7%s &e%s", msg.getMessage(Message.CURRENTLY), vehicle.getFuel()));
+        ItemStack option3 = ItemUtils.getMenuCustomItem(Material.DIAMOND_HOE, "&6" + msg.getMessage(Message.FUEL_USAGE), 58, String.format("&7%s &e%s", msg.getMessage(Message.CURRENTLY), vehicle.getFuelUsage()));
         DrawOptions(p, inv, option1, option2, option3);
     }
 
@@ -132,10 +132,10 @@ public class MenuUtils {
 
         ItemStack option1;
         if ((boolean) ConfigModule.vehicleDataConfig.get(licensePlate, VehicleDataConfig.Option.TRUNK_ENABLED))
-            option1 = ItemUtils.getMenuItem(Material.CHEST, 1, "&6" + msg.getMessage(Message.TOGGLE_TRUNK), String.format("&7%s: &e%s", msg.getMessage(Message.CURRENTLY), msg.getMessage(Message.TURNED_ON)));
+            option1 = ItemUtils.getMenuItem(Material.CHEST, 1, "&6" + msg.getMessage(Message.TOGGLE_TRUNK), String.format("&7%s &e%s", msg.getMessage(Message.CURRENTLY), msg.getMessage(Message.TURNED_ON)));
         else
-            option1 = ItemUtils.getMenuItem(Material.CHEST, 1, "&6" + msg.getMessage(Message.TOGGLE_TRUNK), String.format("&7%s: &e%s", msg.getMessage(Message.CURRENTLY), msg.getMessage(Message.TURNED_OFF)));
-        ItemStack option2 = ItemUtils.getMenuItem(Material.CHEST, 1, "&6" + msg.getMessage(Message.EDIT_TRUNK_ROWS), String.format("&7%s: &e%s", msg.getMessage(Message.CURRENTLY), ConfigModule.vehicleDataConfig.get(licensePlate, VehicleDataConfig.Option.TRUNK_ROWS)));
+            option1 = ItemUtils.getMenuItem(Material.CHEST, 1, "&6" + msg.getMessage(Message.TOGGLE_TRUNK), String.format("&7%s &e%s", msg.getMessage(Message.CURRENTLY), msg.getMessage(Message.TURNED_OFF)));
+        ItemStack option2 = ItemUtils.getMenuItem(Material.CHEST, 1, "&6" + msg.getMessage(Message.EDIT_TRUNK_ROWS), String.format("&7%s &e%s", msg.getMessage(Message.CURRENTLY), ConfigModule.vehicleDataConfig.get(licensePlate, VehicleDataConfig.Option.TRUNK_ROWS)));
         ItemStack option3 = ItemUtils.getMenuItem(Material.CHEST, 1, "&6" + msg.getMessage(Message.OPEN_TRUNK),  "&7" + msg.getMessage(Message.CLICK_TO_OPEN));
         DrawOptions(p, inv, option1, option2, option3);
     }
@@ -174,7 +174,7 @@ public class MenuUtils {
                 (short) 5,
                 1,
                 "&6" + msg.getMessage(Message.ACCELERATION_SPEED),
-                String.format("&7%s: &e%s", msg.getMessage(Message.CURRENTLY), data.get(licensePlate, VehicleDataConfig.Option.ACCELERATION_SPEED))
+                String.format("&7%s &e%s", msg.getMessage(Message.CURRENTLY), data.get(licensePlate, VehicleDataConfig.Option.ACCELERATION_SPEED))
         );
         ItemStack option2 = ItemUtils.getMenuItem(
                 "LIME_STAINED_GLASS",
@@ -182,7 +182,7 @@ public class MenuUtils {
                 (short) 5,
                 1,
                 "&6" + msg.getMessage(Message.MAX_SPEED),
-                String.format("&7%s: &e%s", msg.getMessage(Message.CURRENTLY), data.get(licensePlate, VehicleDataConfig.Option.MAX_SPEED))
+                String.format("&7%s &e%s", msg.getMessage(Message.CURRENTLY), data.get(licensePlate, VehicleDataConfig.Option.MAX_SPEED))
         );
         ItemStack option3 = ItemUtils.getMenuItem(
                 "LIME_STAINED_GLASS",
@@ -190,7 +190,7 @@ public class MenuUtils {
                 (short) 5,
                 1,
                 "&6" + msg.getMessage(Message.BRAKING_SPEED),
-                String.format("&7%s: &e%s", msg.getMessage(Message.CURRENTLY), data.get(licensePlate, VehicleDataConfig.Option.BRAKING_SPEED))
+                String.format("&7%s &e%s", msg.getMessage(Message.CURRENTLY), data.get(licensePlate, VehicleDataConfig.Option.BRAKING_SPEED))
         );
         ItemStack option4 = ItemUtils.getMenuItem(
                 "LIME_STAINED_GLASS",
@@ -198,7 +198,7 @@ public class MenuUtils {
                 (short) 5,
                 1,
                 "&6" + msg.getMessage(Message.FRICTION_SPEED),
-                String.format("&7%s: &e%s", msg.getMessage(Message.CURRENTLY), data.get(licensePlate, VehicleDataConfig.Option.FRICTION_SPEED))
+                String.format("&7%s &e%s", msg.getMessage(Message.CURRENTLY), data.get(licensePlate, VehicleDataConfig.Option.FRICTION_SPEED))
         );
         ItemStack option5 = ItemUtils.getMenuItem(
                 "LIME_STAINED_GLASS",
@@ -206,7 +206,7 @@ public class MenuUtils {
                 (short) 5,
                 1,
                 "&6" + msg.getMessage(Message.ROTATION_SPEED),
-                String.format("&7%s: &e%s", msg.getMessage(Message.CURRENTLY), data.get(licensePlate, VehicleDataConfig.Option.ROTATION_SPEED))
+                String.format("&7%s &e%s", msg.getMessage(Message.CURRENTLY), data.get(licensePlate, VehicleDataConfig.Option.ROTATION_SPEED))
         );
         ItemStack option6 = ItemUtils.getMenuItem(
                 "LIME_STAINED_GLASS",
@@ -214,7 +214,7 @@ public class MenuUtils {
                 (short) 5,
                 1,
                 "&6" + msg.getMessage(Message.MAX_SPEED_BACKWARDS),
-                String.format("&7%s: &e%s", msg.getMessage(Message.CURRENTLY), data.get(licensePlate, VehicleDataConfig.Option.MAX_SPEED_BACKWARDS))
+                String.format("&7%s &e%s", msg.getMessage(Message.CURRENTLY), data.get(licensePlate, VehicleDataConfig.Option.MAX_SPEED_BACKWARDS))
         );
 
         inv.setItem(10, new ItemFactory(option1).setNBT("mtvehicles.item", "1").toItemStack());
