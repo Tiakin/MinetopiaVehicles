@@ -22,9 +22,10 @@ TRANSLATORS:
 - Japanese: kazumasa200
 - Hebrew: roi
 - Russian: peck1
-- French: Alane38
+- French: Alane38, Tiakin
 - Thai: AungS8430
 - Greek: DevProdj
+- Polish: alimyzz
 
 RESOURCE PACK:
 - Boats: sebxter
