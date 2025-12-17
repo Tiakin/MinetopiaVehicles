@@ -46,9 +46,7 @@ public class PacketHandler {
             unexpectedException(e);
             return;
         }
-        
         ChannelDuplexHandler channelDuplexHandler;
-        
         if (useRepeatingTask) {
             // Repeating task pattern for 1.21.2+
             channelDuplexHandler = new ChannelDuplexHandler() {
@@ -95,52 +93,62 @@ public class PacketHandler {
                 }
             };
         }
-        
         Channel channel = null;
         try {
             // Build versioned CraftPlayer class name
             String version = getServerVersion().name();
             String craftPlayerClassName = "org.bukkit.craftbukkit." + version + ".entity.CraftPlayer";
             Class<?> craftPlayerClass = Class.forName(craftPlayerClassName);
-            
+
             // Get EntityPlayer handle
             Method getHandleMethod = craftPlayerClass.getMethod("getHandle");
             Object entityPlayer = getHandleMethod.invoke(player);
-            
+
             // Get PlayerConnection
             Field playerConnectionField = entityPlayer.getClass().getDeclaredField(playerConnectionFieldName);
             playerConnectionField.setAccessible(true);
             Object playerConnection = playerConnectionField.get(entityPlayer);
-            
+
             // Get NetworkManager
             Field networkManagerField;
             if (getServerVersion().isNewerOrEqualTo(ServerVersion.v1_20_R2)) {
                 networkManagerField = Class.forName("net.minecraft.server.network.ServerCommonPacketListenerImpl")
-                    .getDeclaredField(networkManagerFieldName);
+                        .getDeclaredField(networkManagerFieldName);
             } else {
                 networkManagerField = playerConnection.getClass().getDeclaredField(networkManagerFieldName);
             }
             networkManagerField.setAccessible(true);
             Object networkManager = networkManagerField.get(playerConnection);
-            
+
             Field channelField = networkManager.getClass().getDeclaredField(channelFieldName);
             channelField.setAccessible(true);
             channel = (Channel) channelField.get(networkManager);
 
             channel.pipeline().addBefore("packet_handler", player.getName(), channelDuplexHandler);
-            
+
         } catch (IllegalArgumentException e) {
             // In case of plugin reload, prevent duplicate handler name exception
             if (channel == null) {
                 unexpectedException(e);
                 return;
             }
-            if (!channel.pipeline().names().contains(player.getName())) return;
+            if (!channel.pipeline().names().contains(player.getName()))
+                return;
             channel.pipeline().remove(player.getName());
-            setupPacketHandler(player, useRepeatingTask, playerConnectionFieldName, networkManagerFieldName, channelFieldName);
+            setupPacketHandler(player, useRepeatingTask, playerConnectionFieldName, networkManagerFieldName,
+                    channelFieldName);
         } catch (Exception e) {
             unexpectedException(e);
         }
+    }
+    
+    /**
+     * Packet handler for vehicle steering in 1.21.11
+     * 
+     * @param player Player whose steering is being regarded
+     */
+    public static void movement_1_21_R7(Player player) {
+        setupPacketHandler(player, true, "g", "e", "k");
     }
 
     /**

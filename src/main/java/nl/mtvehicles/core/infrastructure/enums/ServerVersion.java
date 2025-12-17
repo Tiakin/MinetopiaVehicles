@@ -116,7 +116,13 @@ public enum ServerVersion {
      * 
      * @since 2.5.8
      */
-    v1_21_R6(PacketHandler::movement_1_21_R6);
+    v1_21_R6(PacketHandler::movement_1_21_R6),
+    /**
+     * 1.21.11
+     * 
+     * @since 2.5.8
+     */
+    v1_21_R7(PacketHandler::movement_1_21_R7);
 
     /**
      * Function interface for packet movement handlers
