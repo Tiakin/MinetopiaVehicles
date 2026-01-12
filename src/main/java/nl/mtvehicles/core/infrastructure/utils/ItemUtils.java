@@ -5,6 +5,7 @@ import nl.mtvehicles.core.infrastructure.annotations.VersionSpecific;
 import nl.mtvehicles.core.infrastructure.dataconfig.MessagesConfig;
 import nl.mtvehicles.core.infrastructure.dataconfig.VehicleDataConfig;
 import nl.mtvehicles.core.infrastructure.enums.Message;
+import nl.mtvehicles.core.infrastructure.enums.ServerVersion;
 import nl.mtvehicles.core.infrastructure.vehicle.Vehicle;
 import nl.mtvehicles.core.infrastructure.vehicle.VehicleUtils;
 import nl.mtvehicles.core.infrastructure.modules.ConfigModule;
@@ -291,7 +292,7 @@ public class ItemUtils {
      */
     @VersionSpecific
     public static Material getStainedGlassPane(){
-        if (getServerVersion().is1_12_R1()) return Material.matchMaterial("STAINED_GLASS_PANE");
+        if (getServerVersion() == ServerVersion.v1_12_R1) return Material.matchMaterial("STAINED_GLASS_PANE");
         else return Material.matchMaterial("WHITE_STAINED_GLASS_PANE");
     }
 

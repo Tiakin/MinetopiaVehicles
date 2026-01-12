@@ -3,6 +3,8 @@ package nl.mtvehicles.core.infrastructure.utils;
 import de.tr7zw.changeme.nbtapi.NBTItem;
 import nl.mtvehicles.core.Main;
 import nl.mtvehicles.core.infrastructure.annotations.VersionSpecific;
+import nl.mtvehicles.core.infrastructure.enums.ServerVersion;
+
 import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
@@ -48,7 +50,7 @@ public class ItemFactory {
 
     @VersionSpecific
     public ItemFactory setDurability(int durability) {
-        if (getServerVersion().is1_12_R1()) this.item.setDurability((short) durability);
+        if (getServerVersion() == ServerVersion.v1_12_R1) this.item.setDurability((short) durability);
         else {
             ItemMeta im = this.item.getItemMeta();
             ((org.bukkit.inventory.meta.Damageable) im).setDamage(durability);

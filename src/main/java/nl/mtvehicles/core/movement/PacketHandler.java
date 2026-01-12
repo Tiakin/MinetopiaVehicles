@@ -331,22 +331,22 @@ public class PacketHandler {
     public static boolean isObjectPacket(Object object) {
         final String errorMessage = "An unexpected error occurred (given object is not a valid steering packet). Try reinstalling the plugin or contact the developer: https://discord.gg/vehicle";
 
-        if (getServerVersion().is1_12_R1()) {
+        if (getServerVersion() == ServerVersion.v1_12_R1) {
             if (!(object instanceof net.minecraft.server.v1_12_R1.PacketPlayInSteerVehicle)) {
                 Main.logSevere(errorMessage);
                 return false;
             }
-        } else if (getServerVersion().is1_13_R2()) {
+        } else if (getServerVersion() == ServerVersion.v1_13_R2) {
             if (!(object instanceof net.minecraft.server.v1_13_R2.PacketPlayInSteerVehicle)){
                 Main.logSevere(errorMessage);
                 return false;
             }
-        } else if (getServerVersion().is1_15_R1()) {
+        } else if (getServerVersion() == ServerVersion.v1_15_R1) {
             if (!(object instanceof net.minecraft.server.v1_15_R1.PacketPlayInSteerVehicle)){
                 Main.logSevere(errorMessage);
                 return false;
             }
-        } else if (getServerVersion().is1_16_R3()) {
+        } else if (getServerVersion() == ServerVersion.v1_16_R3) {
             if (!(object instanceof net.minecraft.server.v1_16_R3.PacketPlayInSteerVehicle)){
                 Main.logSevere(errorMessage);
                 return false;
