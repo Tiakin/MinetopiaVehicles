@@ -120,7 +120,7 @@ public enum ServerVersion {
     /**
      * 1.21.11
      * 
-     * @since 2.5.8
+     * @since 2.5.9
      */
     v1_21_R7(PacketHandler::movement_1_21_R7);
 
