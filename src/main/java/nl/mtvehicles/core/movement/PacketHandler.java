@@ -37,7 +37,10 @@ public class PacketHandler {
         final Class<?> packetClass;
         try {
             String version = getServerVersion().name();
-            if (getServerVersion().isNewerOrEqualTo(ServerVersion.v1_17_R1)) {
+            if(getServerVersion().isNewerOrEqualTo(ServerVersion.v26_1)) {
+                packetClass = Class.forName("net.minecraft.network.protocol.game.ServerboundPlayerInputPacket");
+            }
+            else if (getServerVersion().isNewerOrEqualTo(ServerVersion.v1_17_R1)) {
                 packetClass = Class.forName("net.minecraft.network.protocol.game.PacketPlayInSteerVehicle");
             } else {
                 packetClass = Class.forName("net.minecraft.server." + version + ".PacketPlayInSteerVehicle");
@@ -98,6 +101,9 @@ public class PacketHandler {
             // Build versioned CraftPlayer class name
             String version = getServerVersion().name();
             String craftPlayerClassName = "org.bukkit.craftbukkit." + version + ".entity.CraftPlayer";
+            if(getServerVersion().isNewerOrEqualTo(ServerVersion.v26_1)) {
+                craftPlayerClassName = "org.bukkit.craftbukkit.entity.CraftPlayer";
+            }
             Class<?> craftPlayerClass = Class.forName(craftPlayerClassName);
 
             // Get EntityPlayer handle
@@ -140,6 +146,15 @@ public class PacketHandler {
         } catch (Exception e) {
             unexpectedException(e);
         }
+    }
+
+    /**
+     * Packet handler for vehicle steering in 26.1
+     * 
+     * @param player Player whose steering is being regarded
+     */
+    public static void movement_26_1(Player player) {
+        setupPacketHandler(player, true, "connection", "connection", "channel");
     }
     
     /**
@@ -331,32 +346,27 @@ public class PacketHandler {
     public static boolean isObjectPacket(Object object) {
         final String errorMessage = "An unexpected error occurred (given object is not a valid steering packet). Try reinstalling the plugin or contact the developer: https://discord.gg/vehicle";
 
-        if (getServerVersion() == ServerVersion.v1_12_R1) {
-            if (!(object instanceof net.minecraft.server.v1_12_R1.PacketPlayInSteerVehicle)) {
+        try {
+            Class<?> steeringPacketClass;
+            if (getServerVersion().isOlderThan(ServerVersion.v1_17_R1)) {
+                String version = getServerVersion().name();
+                steeringPacketClass = Class.forName("net.minecraft.server." + version + ".PacketPlayInSteerVehicle");
+            } else if (getServerVersion().isOlderThan(ServerVersion.v26_1)) {
+                steeringPacketClass = Class.forName("net.minecraft.network.protocol.game.PacketPlayInSteerVehicle");
+            } else {
+                steeringPacketClass = Class.forName("net.minecraft.network.protocol.game.ServerboundPlayerInputPacket");
+            }
+
+            if (!steeringPacketClass.isInstance(object)) {
                 Main.logSevere(errorMessage);
                 return false;
             }
-        } else if (getServerVersion() == ServerVersion.v1_13_R2) {
-            if (!(object instanceof net.minecraft.server.v1_13_R2.PacketPlayInSteerVehicle)){
-                Main.logSevere(errorMessage);
-                return false;
-            }
-        } else if (getServerVersion() == ServerVersion.v1_15_R1) {
-            if (!(object instanceof net.minecraft.server.v1_15_R1.PacketPlayInSteerVehicle)){
-                Main.logSevere(errorMessage);
-                return false;
-            }
-        } else if (getServerVersion() == ServerVersion.v1_16_R3) {
-            if (!(object instanceof net.minecraft.server.v1_16_R3.PacketPlayInSteerVehicle)){
-                Main.logSevere(errorMessage);
-                return false;
-            }
-        } else if (getServerVersion().isNewerOrEqualTo(ServerVersion.v1_17_R1)) {
-            if (!(object instanceof net.minecraft.network.protocol.game.PacketPlayInSteerVehicle)){
-                Main.logSevere(errorMessage);
-                return false;
-            }
+        } catch (ClassNotFoundException e) {
+            Main.logSevere(errorMessage);
+            e.printStackTrace();
+            return false;
         }
+
         return true;
     }
 

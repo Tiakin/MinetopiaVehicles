@@ -13,7 +13,6 @@ import nl.mtvehicles.core.infrastructure.dataconfig.VehicleDataConfig;
 import nl.mtvehicles.core.infrastructure.enums.*;
 import nl.mtvehicles.core.infrastructure.modules.ConfigModule;
 import nl.mtvehicles.core.infrastructure.modules.DependencyModule;
-import nl.mtvehicles.core.infrastructure.modules.VersionModule;
 import nl.mtvehicles.core.infrastructure.utils.BossBarUtils;
 import nl.mtvehicles.core.infrastructure.vehicle.VehicleData;
 import nl.mtvehicles.core.infrastructure.vehicle.VehicleUtils;
@@ -696,8 +695,11 @@ public class VehicleMovement {
     @VersionSpecific
     protected void teleportSeat(ArmorStand seat, Location loc){
         try {
-            String version = getServerVersion().name();
-            String craftEntityClassName = "org.bukkit.craftbukkit." + version + ".entity.CraftEntity";
+            ServerVersion version = getServerVersion();
+            String craftEntityClassName = "org.bukkit.craftbukkit." + version.name() + ".entity.CraftEntity";
+            if(version.isNewerOrEqualTo(ServerVersion.v26_1)) {
+                craftEntityClassName = "org.bukkit.craftbukkit.entity.CraftEntity";
+            }
             Class<?> craftEntityClass = Class.forName(craftEntityClassName);
 
             Method getHandleMethod = craftEntityClass.getMethod("getHandle");
@@ -708,25 +710,25 @@ public class VehicleMovement {
             e.printStackTrace();
         }
     }
-
     /**
      * Get the String name of the method for teleporting an ArmorStand. Changes between versions.
      * @return Teleport method's name as String.
      */
     @VersionSpecific
     protected static String getTeleportMethod(){
-        if (getServerVersion().isNewerOrEqualTo(ServerVersion.v1_18_R1)) return "a";
+        if (getServerVersion().isNewerOrEqualTo(ServerVersion.v26_1)) return "absSnapTo";
+        else if (getServerVersion().isNewerOrEqualTo(ServerVersion.v1_18_R1)) return "a";
         else return "setLocation";
     }
 
     /**
      * Teleport a seat to a desired location. The seat must already be specified as a CraftBukkit Entity.
      * @param seat Seat's ArmorStand as a CraftBukkit Entity
-     * @param x X-coordinate of the locatoin
-     * @param y Y-coordinate of the locatoin
-     * @param z Z-coordinate of the locatoin
-     * @param yaw Yaw of the locatoin
-     * @param pitch Pitch of the locatoin
+     * @param x X-coordinate of the location
+     * @param y Y-coordinate of the location
+     * @param z Z-coordinate of the location
+     * @param yaw Yaw of the location
+     * @param pitch Pitch of the location
      */
     protected void teleportSeat(Object seat, double x, double y, double z, float yaw, float pitch){
         schedulerRun(() -> {
@@ -930,29 +932,36 @@ public class VehicleMovement {
      * @return True if player is jumping
      */
     protected boolean steerIsJumping(){
-        boolean isJumping = false;
         try {
-            if(getServerVersion().isOlderOrEqualTo(ServerVersion.v1_21_R1)){
-                
+            ServerVersion version = getServerVersion();
+            Class<?> packetClass = packet.getClass();
+
+            if (version.isOlderOrEqualTo(ServerVersion.v1_21_R1)) {
                 String declaredMethod = "d";
 
-                if (getServerVersion().isNewerOrEqualTo(ServerVersion.v1_20_R2) && getServerVersion().isOlderThan(ServerVersion.v1_20_R4))  {
+                if (version.isNewerOrEqualTo(ServerVersion.v1_20_R2) && version.isOlderThan(ServerVersion.v1_20_R4)) {
                     declaredMethod = "e";
-                } else if (getServerVersion().isNewerOrEqualTo(ServerVersion.v1_20_R4)) {
+                } else if (version.isNewerOrEqualTo(ServerVersion.v1_20_R4)) {
                     declaredMethod = "f";
                 }
-                Method method = packet.getClass().getDeclaredMethod(declaredMethod);
-                isJumping = (Boolean) method.invoke(packet);
-            } else { // 1_21_R2 and newer
-            Object input = packet.getClass().getDeclaredMethod("b").invoke(packet);
-            
-            isJumping = (boolean) input.getClass().getDeclaredMethod("e").invoke(input);
+                Method method = packetClass.getDeclaredMethod(declaredMethod);
+                return (Boolean) method.invoke(packet);
             }
-            
+
+            String inputMethod = "b";
+            String jumpMethod = "e";
+
+            if (version.isNewerOrEqualTo(ServerVersion.v26_1)) {
+                inputMethod = "input";
+                jumpMethod = "jump";
+            }
+
+            Object input = packetClass.getDeclaredMethod(inputMethod).invoke(packet);
+            return (boolean) input.getClass().getDeclaredMethod(jumpMethod).invoke(input);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return isJumping;
+        return false;
     }
 
     /**
@@ -960,29 +969,42 @@ public class VehicleMovement {
      * @return Rotation from the packet
      */
     protected float steerGetXxa(){
-        float Xxa = 0;
         try {
-            if(getServerVersion().isOlderOrEqualTo(ServerVersion.v1_21_R1)){
+            ServerVersion version = getServerVersion();
+            Class<?> packetClass = packet.getClass();
+
+            if (version.isOlderOrEqualTo(ServerVersion.v1_21_R1)) {
                 String declaredMethod = "b";
 
-                if (getServerVersion().isNewerOrEqualTo(ServerVersion.v1_19_R3) && getServerVersion().isOlderThan(ServerVersion.v1_20_R4)) {
+                if (version.isNewerOrEqualTo(ServerVersion.v1_19_R3) && version.isOlderThan(ServerVersion.v1_20_R4)) {
                     declaredMethod = "a";
                 }
 
-                Method method = packet.getClass().getDeclaredMethod(declaredMethod);
-                Xxa = (float) method.invoke(packet);
-            } else { // 1_21_R2 and newer
-                Object input = packet.getClass().getDeclaredMethod("b").invoke(packet);
-                if ((boolean) input.getClass().getDeclaredMethod("c").invoke(input)) {
-                    Xxa = 1;
-                } else if ((boolean) input.getClass().getDeclaredMethod("d").invoke(input)) {
-                    Xxa = -1;
-                }
+                Method method = packetClass.getDeclaredMethod(declaredMethod);
+                return (float) method.invoke(packet);
+            }
+
+            String inputMethod = "b";
+            String leftMethod = "c";
+            String rightMethod = "d";
+
+            if (version.isNewerOrEqualTo(ServerVersion.v26_1)) {
+                inputMethod = "input";
+                leftMethod = "left";
+                rightMethod = "right";
+            }
+
+            Object input = packetClass.getDeclaredMethod(inputMethod).invoke(packet);
+            if ((boolean) input.getClass().getDeclaredMethod(leftMethod).invoke(input)) {
+                return 1;
+            }
+            if ((boolean) input.getClass().getDeclaredMethod(rightMethod).invoke(input)) {
+                return -1;
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return Xxa;
+        return 0;
     }
 
     /**
@@ -990,31 +1012,44 @@ public class VehicleMovement {
      * @return Movement from the packet
      */
     protected float steerGetZza(){
-        float Zza = 0;
         try {
-            if(getServerVersion().isOlderOrEqualTo(ServerVersion.v1_21_R1)){
+            ServerVersion version = getServerVersion();
+            Class<?> packetClass = packet.getClass();
+
+            if (version.isOlderOrEqualTo(ServerVersion.v1_21_R1)) {
                 String declaredMethod = "c";
 
-                if (VersionModule.getServerVersion().isNewerOrEqualTo(ServerVersion.v1_20_R2) && getServerVersion().isOlderThan(ServerVersion.v1_20_R4)) {
+                if (version.isNewerOrEqualTo(ServerVersion.v1_20_R2) && version.isOlderThan(ServerVersion.v1_20_R4)) {
                     declaredMethod = "d";
-                } else if(getServerVersion().isNewerOrEqualTo(ServerVersion.v1_20_R4)){
+                } else if (version.isNewerOrEqualTo(ServerVersion.v1_20_R4)) {
                     declaredMethod = "e";
                 }
 
-                Method method = packet.getClass().getDeclaredMethod(declaredMethod);
-                Zza = (float) method.invoke(packet);
-            } else { // 1_21_R2 and newer
-                Object input = packet.getClass().getDeclaredMethod("b").invoke(packet);
-                if ((boolean) input.getClass().getDeclaredMethod("a").invoke(input)) {
-                    Zza = 1;
-                } else if ((boolean) input.getClass().getDeclaredMethod("b").invoke(input)) {
-                    Zza = -1;
-                }
+                Method method = packetClass.getDeclaredMethod(declaredMethod);
+                return (float) method.invoke(packet);
+            }
+
+            String inputMethod = "b";
+            String forwardMethod = "a";
+            String backwardMethod = "b";
+
+            if (version.isNewerOrEqualTo(ServerVersion.v26_1)) {
+                inputMethod = "input";
+                forwardMethod = "forward";
+                backwardMethod = "backward";
+            }
+
+            Object input = packetClass.getDeclaredMethod(inputMethod).invoke(packet);
+            if ((boolean) input.getClass().getDeclaredMethod(forwardMethod).invoke(input)) {
+                return 1;
+            }
+            if ((boolean) input.getClass().getDeclaredMethod(backwardMethod).invoke(input)) {
+                return -1;
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return Zza;
+        return 0;
     }
 
     /**

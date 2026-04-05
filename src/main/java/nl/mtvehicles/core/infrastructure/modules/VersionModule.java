@@ -64,7 +64,12 @@ public class VersionModule {
             try {
                 serverVersionString = Bukkit.getServer().getMinecraftVersion();
             } catch (NoSuchMethodError e) {
-                serverVersionString = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
+                String packageName = Bukkit.getServer().getClass().getPackage().getName();
+                if(packageName.split("\\.").length < 4) {
+                    serverVersionString = Bukkit.getServer().getBukkitVersion().split("-")[0];
+                } else {
+                    serverVersionString = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
+                }
             }
             selectServerVersion(serverVersionString);
         }
@@ -197,6 +202,10 @@ public class VersionModule {
             case "v1_21_R7":
                 serverVersion = ServerVersion.v1_21_R7;
                 break;
+            case "26.1":
+            case "26.1.1":
+                serverVersion = ServerVersion.v26_1;
+                break;
 
         }
     }
@@ -212,7 +221,7 @@ public class VersionModule {
 
         List<String> highestVersions = Arrays.asList(
                 "1.12.2", "1.13.2", "1.15.2", "1.16.5", "1.17.1", "1.18.2", "1.19.4", "1.20.6", "1.21.1", "1.21.3",
-                "1.21.4", "1.21.5", "1.21.6", "1.21.7", "1.21.8", "1.21.9", "1.21.10", "1.21.11",
+                "1.21.4", "1.21.5", "1.21.6", "1.21.7", "1.21.8", "1.21.9", "1.21.10", "1.21.11", "26.1", "26.1.1",
                 "v1_21_R7", "v1_21_R6", "v1_21_R5", "v1_21_R4", "v1_21_R3", "v1_21_R2", "v1_21_R1", "v1_20_R4",
                 "v1_19_R3", "v1_18_R2", "v1_17_R1", "v1_16_R3", "v1_15_R1", "v1_13_R2", "v1_12_R1"
 
@@ -223,7 +232,12 @@ public class VersionModule {
             try {
                 serverVersionString = Bukkit.getServer().getMinecraftVersion();
             } catch (NoSuchMethodError e) {
-                serverVersionString = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
+                String packageName = Bukkit.getServer().getClass().getPackage().getName();
+                if(packageName.split("\\.").length < 4) {
+                    serverVersionString = Bukkit.getServer().getBukkitVersion().split("-")[0];
+                } else {
+                    serverVersionString = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
+                }
             }
         }
 
