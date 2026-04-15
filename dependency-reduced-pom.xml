@@ -104,141 +104,15 @@
   </repositories>
   <dependencies>
     <dependency>
-      <groupId>io.papermc.paper</groupId>
+      <groupId>com.destroystokyo.paper</groupId>
       <artifactId>paper-api</artifactId>
-      <version>1.20-R0.1-SNAPSHOT</version>
+      <version>1.16.5-R0.1-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.spigotmc</groupId>
       <artifactId>spigot</artifactId>
       <version>1.12.2-R0.1-SNAPSHOT</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.spigotmc.</groupId>
-      <artifactId>spigot</artifactId>
-      <version>1.13.2-R0.1-SNAPSHOT</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.spigotmc..</groupId>
-      <artifactId>spigot</artifactId>
-      <version>1.15.2-R0.1-SNAPSHOT</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.spigotmc...</groupId>
-      <artifactId>spigot</artifactId>
-      <version>1.16.5-R0.1-SNAPSHOT</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.spigotmc....</groupId>
-      <artifactId>spigot</artifactId>
-      <version>1.17.1-R0.1-SNAPSHOT</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.spigotmc.....</groupId>
-      <artifactId>spigot</artifactId>
-      <version>1.18.1-R0.1-SNAPSHOT</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.spigotmc......</groupId>
-      <artifactId>spigot</artifactId>
-      <version>1.18.2-R0.1-SNAPSHOT</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.spigotmc.......</groupId>
-      <artifactId>spigot</artifactId>
-      <version>1.19-R0.1-SNAPSHOT</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.spigotmc........</groupId>
-      <artifactId>spigot</artifactId>
-      <version>1.19.3-R0.1-SNAPSHOT</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.spigotmc.........</groupId>
-      <artifactId>spigot</artifactId>
-      <version>1.19.4-R0.1-SNAPSHOT</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.spigotmc..........</groupId>
-      <artifactId>spigot</artifactId>
-      <version>1.20-R0.1-SNAPSHOT</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.spigotmc...........</groupId>
-      <artifactId>spigot</artifactId>
-      <version>1.20.2-R0.1-SNAPSHOT</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.spigotmc............</groupId>
-      <artifactId>spigot</artifactId>
-      <version>1.20.4-R0.1-SNAPSHOT</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.spigotmc.............</groupId>
-      <artifactId>spigot</artifactId>
-      <version>1.20.6-R0.1-SNAPSHOT</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.spigotmc..............</groupId>
-      <artifactId>spigot</artifactId>
-      <version>1.21.1-R0.1-SNAPSHOT</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.spigotmc...............</groupId>
-      <artifactId>spigot</artifactId>
-      <version>1.21.3-R0.1-SNAPSHOT</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.spigotmc................</groupId>
-      <artifactId>spigot</artifactId>
-      <version>1.21.4-R0.1-SNAPSHOT</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.spigotmc.................</groupId>
-      <artifactId>spigot</artifactId>
-      <version>1.21.5-R0.1-SNAPSHOT</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.spigotmc..................</groupId>
-      <artifactId>spigot</artifactId>
-      <version>1.21.8-R0.1-SNAPSHOT</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.spigotmc...................</groupId>
-      <artifactId>spigot</artifactId>
-      <version>1.21.10-R0.1-SNAPSHOT</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.spigotmc....................</groupId>
-      <artifactId>spigot</artifactId>
-      <version>1.21.11-R0.1-SNAPSHOT</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.spigotmc.....................</groupId>
-      <artifactId>spigot</artifactId>
-      <version>26.1.1-R0.1-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -274,8 +148,8 @@
     </repository>
   </distributionManagement>
   <properties>
-    <maven.compiler.target>16</maven.compiler.target>
-    <maven.compiler.source>16</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+    <maven.compiler.source>1.8</maven.compiler.source>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
   </properties>

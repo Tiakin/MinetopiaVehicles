@@ -1110,7 +1110,7 @@ public class VehicleMovement {
         Location loc = new Location(standMain.getWorld(), xvp, standMain.getLocation().getY() + yOffset, zvp, fbvp.getYaw(), fbvp.getPitch());
 
         if(loc.getBlock().getType().equals(Material.AIR)){
-            loc.getBlock().setType(Material.LIGHT);
+            loc.getBlock().setType(Material.getMaterial("LIGHT"));
             Bukkit.getScheduler().runTaskLater(instance, () -> loc.getBlock().setType(Material.AIR), 10L);
         }
     }
