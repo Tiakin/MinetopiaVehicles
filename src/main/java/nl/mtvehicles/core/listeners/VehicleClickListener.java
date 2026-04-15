@@ -11,6 +11,8 @@ import nl.mtvehicles.core.infrastructure.models.MTVListener;
 import nl.mtvehicles.core.infrastructure.vehicle.Vehicle;
 import nl.mtvehicles.core.infrastructure.vehicle.VehicleUtils;
 import nl.mtvehicles.core.infrastructure.modules.ConfigModule;
+
+import org.bukkit.GameMode;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -40,6 +42,8 @@ public class VehicleClickListener extends MTVListener {
         event.setCancelled(true);
 
         if (entity.getCustomName().startsWith("VEHICLE")) return;
+
+        if(player.getGameMode() == GameMode.SPECTATOR) return;
 
         final String playerName = player.getName();
         final long currentTime = System.currentTimeMillis();
