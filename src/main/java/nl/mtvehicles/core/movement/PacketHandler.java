@@ -311,6 +311,14 @@ public class PacketHandler {
     }
 
     /**
+     * Packet handler for vehicle steering in versions 1.14-1.14.4
+     * @param player Player whose steering is being regarded
+     */
+    public static void movement_1_14_R1(Player player) {
+        setupPacketHandler(player, false, "playerConnection", "networkManager", "channel");
+    }
+
+    /**
      * Packet handler for vehicle steering in 1.13.2 and 1.13.1 (NMS version 1_13_R1 is not supported)
      * @param player Player whose steering is being regarded
      */

@@ -111,6 +111,14 @@ public class VersionModule {
             case "v1_13_R2":
                 serverVersion = ServerVersion.v1_13_R2;
                 break;
+            case "1.14":
+            case "1.14.1":
+            case "1.14.2":
+            case "1.14.3":
+            case "1.14.4":
+            case "v1_14_R1":
+                serverVersion = ServerVersion.v1_14_R1;
+                break;
             case "1.15":
             case "1.15.1":
             case "1.15.2":
