@@ -92,18 +92,12 @@ public final class VehicleUtils {
             standRotors.setVisible(false);
 
             if ((boolean) ConfigModule.defaultConfig.get(DefaultConfig.Option.HELICOPTER_BLADES_ALWAYS_ON)) {
-                ItemStack rotor = (new ItemFactory(Material.getMaterial("DIAMOND_HOE"))).setDurability((short) 1058).setName(TextUtils.colorize("&6Wieken")).setNBT("mtvehicles.kenteken", licensePlate).toItemStack();
-                ItemMeta itemMeta = rotor.getItemMeta();
-                List<String> lore = new ArrayList<>();
-                lore.add(TextUtils.colorize("&a"));
-                lore.add(TextUtils.colorize("&a" + licensePlate));
-                lore.add(TextUtils.colorize("&a"));
-                itemMeta.setLore(lore);
-                itemMeta.setUnbreakable(true);
-                rotor.setItemMeta(itemMeta);
-
+                ItemStack blades = (ItemStack) blade.get("item");
+                ItemMeta bladesMeta = blades.getItemMeta();
+                bladesMeta.setCustomModelData((int) blades.getDurability());
+                blades.setItemMeta(bladesMeta);
                 allowTicking(standRotors);
-                standRotors.setHelmet((ItemStack) blade.get("item"));
+                standRotors.setHelmet(blades);
             }
         }
     }
@@ -913,7 +907,11 @@ public final class VehicleUtils {
                                 as.setVisible(false);
                                 as.setCustomName("MTVEHICLES_WIEKENS_" + licensePlate);
                                 as.setGravity(false);
-                                as.setHelmet((ItemStack) seat.get("item"));
+                                ItemStack blades = (ItemStack) seat.get("item");
+                                ItemMeta bladesMeta = blades.getItemMeta();
+                                bladesMeta.setCustomModelData((int) blades.getDurability());
+                                blades.setItemMeta(bladesMeta);
+                                as.setHelmet(blades);
 
                                 VehicleData.autostand.put("MTVEHICLES_WIEKENS_" + licensePlate, as);
                             }
