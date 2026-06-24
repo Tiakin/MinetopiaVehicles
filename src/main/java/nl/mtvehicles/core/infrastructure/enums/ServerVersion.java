@@ -20,8 +20,8 @@ public enum ServerVersion {
      */
     v1_13_R2(PacketHandler::movement_1_13_R2),
     /**
-    * 1.14-1.14.4
-    */
+     * 1.14-1.14.4
+     */
     v1_14_R1(PacketHandler::movement_1_14_R1),
     /**
      * 1.15-1.15.2
@@ -128,11 +128,17 @@ public enum ServerVersion {
      */
     v1_21_R7(PacketHandler::movement_1_21_R7),
     /**
-    * 26.1
-    * 
-    * @since 2.5.9
-    */
-    v26_1(PacketHandler::movement_26_1);
+     * 26.1, 26.1.1 and 26.1.2
+     * 
+     * @since 2.5.9
+     */
+    v26_1(PacketHandler::movement_modern),
+    /**
+     * 26.2
+     * 
+     * @since 2.5.9
+     */
+    v26_2(PacketHandler::movement_modern);
 
     /**
      * Function interface for packet movement handlers

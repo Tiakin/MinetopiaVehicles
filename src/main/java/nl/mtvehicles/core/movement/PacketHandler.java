@@ -149,11 +149,11 @@ public class PacketHandler {
     }
 
     /**
-     * Packet handler for vehicle steering in 26.1
+     * Packet handler for vehicle steering in 26.1 and above
      * 
      * @param player Player whose steering is being regarded
      */
-    public static void movement_26_1(Player player) {
+    public static void movement_modern(Player player) {
         setupPacketHandler(player, true, "connection", "connection", "channel");
     }
     
