@@ -143,8 +143,8 @@
   <distributionManagement>
     <repository>
       <id>repsy</id>
-      <name>Gomorrhas MTV Repo</name>
-      <url>https://repo.repsy.io/mvn/gomorrha/mtvehicles</url>
+      <name>gmrrhs MTV Repo</name>
+      <url>https://repo.repsy.io/mvn/gmrrh/mtvehicles</url>
     </repository>
   </distributionManagement>
   <properties>
