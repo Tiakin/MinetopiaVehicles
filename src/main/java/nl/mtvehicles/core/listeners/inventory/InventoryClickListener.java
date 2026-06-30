@@ -5,6 +5,7 @@ import nl.mtvehicles.core.Main;
 import nl.mtvehicles.core.commands.vehiclesubs.VehicleEdit;
 import nl.mtvehicles.core.commands.vehiclesubs.VehicleMenu;
 import nl.mtvehicles.core.events.inventory.InventoryClickEvent;
+import nl.mtvehicles.core.infrastructure.dataconfig.DefaultConfig;
 import nl.mtvehicles.core.infrastructure.dataconfig.MessagesConfig;
 import nl.mtvehicles.core.infrastructure.dataconfig.VehicleDataConfig;
 import nl.mtvehicles.core.infrastructure.enums.InventoryTitle;
@@ -20,14 +21,10 @@ import nl.mtvehicles.core.infrastructure.vehicle.VehicleUtils;
 import nl.mtvehicles.core.infrastructure.modules.ConfigModule;
 import nl.mtvehicles.core.listeners.VehicleVoucherListener;
 import org.bukkit.Bukkit;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.permissions.PermissionAttachmentInfo;
 
 import java.util.HashMap;
 import java.util.List;
@@ -96,9 +93,49 @@ public class InventoryClickListener extends MTVListener {
     }
 
     private void vehicleMenu(){
-        id.put(player.getUniqueId(), 1);
-        raw.put(player.getUniqueId(), clickedSlot);
-        MenuUtils.getvehicleCMD(player, id.get(player.getUniqueId()), raw.get(player.getUniqueId()));
+        int menuRows = (int) ConfigModule.defaultConfig.get(DefaultConfig.Option.VEHICLE_MENU_SIZE);
+        final int menuSize = (menuRows >= 3 && menuRows <= 6) ? menuRows * 9 : 27;
+
+        List<Map<?, ?>> vehicles = ConfigModule.vehiclesConfig.getVehicles();
+        int totalVehicles = vehicles.size();
+        boolean hasPages = totalVehicles > menuSize;
+
+        if (hasPages) {
+            int lastRowStart = menuSize - 9;
+            if (clickedSlot >= lastRowStart && clickedSlot < menuSize) {
+                if (clickedSlot == menuSize - 9) { // Previous page
+                    int currentPage = VehicleMenu.vehicleMenuPage.getOrDefault(player.getUniqueId(), 1);
+                    if (currentPage > 1) {
+                        VehicleMenu.openVehicleMenu(player, currentPage - 1);
+                    }
+                    return;
+                }
+                if (clickedSlot == menuSize - 1) { // Next page
+                    int currentPage = VehicleMenu.vehicleMenuPage.getOrDefault(player.getUniqueId(), 1);
+                    int itemsPerPage = menuSize - 9;
+                    int maxPage = (int) Math.ceil((double) totalVehicles / itemsPerPage);
+                    if (currentPage < maxPage) {
+                        VehicleMenu.openVehicleMenu(player, currentPage + 1);
+                    }
+                    return;
+                }
+                if (clickedSlot == menuSize - 5) { // Close
+                    player.closeInventory();
+                    return;
+                }
+                return;
+            }
+        }
+
+        int currentPage = VehicleMenu.vehicleMenuPage.getOrDefault(player.getUniqueId(), 1);
+        int itemsPerPage = hasPages ? (menuSize - 9) : menuSize;
+        int actualCategoryIndex = clickedSlot + (currentPage - 1) * itemsPerPage;
+
+        if (actualCategoryIndex < totalVehicles) {
+            id.put(player.getUniqueId(), 1);
+            raw.put(player.getUniqueId(), actualCategoryIndex);
+            MenuUtils.getvehicleCMD(player, id.get(player.getUniqueId()), raw.get(player.getUniqueId()));
+        }
     }
 
     private void chooseVehicleMenu(){
