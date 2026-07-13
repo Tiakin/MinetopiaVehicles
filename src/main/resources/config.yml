@@ -17,6 +17,12 @@ autoUpdate: true
 
 # --- General ---
 
+# How vehicle item textures are applied to items.
+# legacy = item damage only (old resource packs)
+# customModelData = CustomModelData only (new resource packs)
+# dual = both damage and CustomModelData (recommended - works with old and new resource packs)
+itemSkinMode: dual
+
 # How many rows the /vehicle menu has. Must be between 3 and 6.
 # Default: 3 (If your input is not valid, the default shall be used.)
 vehicleMenuSize: 3

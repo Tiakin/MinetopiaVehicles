@@ -1,14 +1,16 @@
 package nl.mtvehicles.core.commands.vehiclesubs;
 
+import nl.mtvehicles.core.infrastructure.dataconfig.VehicleDataConfig;
 import nl.mtvehicles.core.infrastructure.enums.Message;
 import nl.mtvehicles.core.infrastructure.models.MTVSubCommand;
-import nl.mtvehicles.core.infrastructure.vehicle.Vehicle;
+import nl.mtvehicles.core.infrastructure.modules.ConfigModule;
 import nl.mtvehicles.core.infrastructure.vehicle.VehicleUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 /**
  * <b>/vehicle transfer %player%</b> - transfer held vehicle to another player (owner only).
@@ -41,18 +43,20 @@ public class VehicleTransfer extends MTVSubCommand {
             return true;
         }
 
-        Vehicle vehicle = VehicleUtils.getVehicle(licensePlate);
-        assert vehicle != null;
+        UUID ownerUUID = VehicleUtils.getOwnerUUID(licensePlate);
+        if (ownerUUID == null) {
+            sendMessage(Message.VEHICLE_NOT_FOUND);
+            return true;
+        }
 
-        if (!vehicle.isOwner(player)) {
+        if (!ownerUUID.equals(player.getUniqueId())) {
             sendMessage(Message.NOT_YOUR_CAR);
             return true;
         }
 
-        vehicle.setRiders(new ArrayList<>());
-        vehicle.setMembers(new ArrayList<>());
-        vehicle.setOwner(argPlayer.getUniqueId());
-        vehicle.save();
+        ConfigModule.vehicleDataConfig.set(licensePlate, VehicleDataConfig.Option.OWNER, argPlayer.getUniqueId().toString());
+        ConfigModule.vehicleDataConfig.set(licensePlate, VehicleDataConfig.Option.RIDERS, new ArrayList<>());
+        ConfigModule.vehicleDataConfig.set(licensePlate, VehicleDataConfig.Option.MEMBERS, new ArrayList<>());
 
         sendMessage(Message.MEMBER_CHANGE);
 
