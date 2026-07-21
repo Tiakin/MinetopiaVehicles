@@ -21,7 +21,6 @@ Messages in the plugin can be displayed in multiple languages. (Default: English
 ✅ For the list of compatible versions, **[see wiki](https://wiki.mtvehicles.eu/faq.html#_5-i-am-getting-an-internal-error-occurred-error)**. <br>
 ✅ We support **latest patch versions** – e.g. 1.16.5 is supported, but 1.16.1 is not. <br>
 ✅ We only support **Spigot/Paper**. Other forks such as Purpur and Leaf are not supported. <br>
-❌ We don't support 1.14.x due to compatibility issues. <br>
 ❌ 1.12.1 and lower is NOT a will NOT be supported!
 
 ---

@@ -13,7 +13,6 @@ import nl.mtvehicles.core.infrastructure.dataconfig.VehicleDataConfig;
 import nl.mtvehicles.core.infrastructure.enums.*;
 import nl.mtvehicles.core.infrastructure.modules.ConfigModule;
 import nl.mtvehicles.core.infrastructure.modules.DependencyModule;
-import nl.mtvehicles.core.infrastructure.modules.VersionModule;
 import nl.mtvehicles.core.infrastructure.utils.BossBarUtils;
 import nl.mtvehicles.core.infrastructure.vehicle.VehicleData;
 import nl.mtvehicles.core.infrastructure.vehicle.VehicleUtils;
@@ -167,7 +166,7 @@ public class VehicleMovement {
             return;
         }
 
-        if ((boolean) ConfigModule.defaultConfig.get(DefaultConfig.Option.HEADLIGHTS_ENABLED) && getServerVersion().isNewerOrEqualTo(ServerVersion.v1_17)){headlightsEnabled = true;}
+        if ((boolean) ConfigModule.defaultConfig.get(DefaultConfig.Option.HEADLIGHTS_ENABLED) && getServerVersion().isNewerOrEqualTo(ServerVersion.v1_17_R1)){headlightsEnabled = true;}
 
 
         schedulerRun(() -> {
@@ -695,46 +694,41 @@ public class VehicleMovement {
      */
     @VersionSpecific
     protected void teleportSeat(ArmorStand seat, Location loc){
-        if (getServerVersion().is1_12()) teleportSeat(((org.bukkit.craftbukkit.v1_12_R1.entity.CraftEntity) seat).getHandle(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
-        else if (getServerVersion().is1_13()) teleportSeat(((org.bukkit.craftbukkit.v1_13_R2.entity.CraftEntity) seat).getHandle(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
-        else if (getServerVersion().is1_15()) teleportSeat(((org.bukkit.craftbukkit.v1_15_R1.entity.CraftEntity) seat).getHandle(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
-        else if (getServerVersion().is1_16()) teleportSeat(((org.bukkit.craftbukkit.v1_16_R3.entity.CraftEntity) seat).getHandle(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
-        else if (getServerVersion().is1_17()) teleportSeat(((org.bukkit.craftbukkit.v1_17_R1.entity.CraftEntity) seat).getHandle(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
-        else if (getServerVersion().is1_18_R1()) teleportSeat(((org.bukkit.craftbukkit.v1_18_R1.entity.CraftEntity) seat).getHandle(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
-        else if (getServerVersion().is1_18_R2()) teleportSeat(((org.bukkit.craftbukkit.v1_18_R2.entity.CraftEntity) seat).getHandle(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
-        else if (getServerVersion().is1_19()) teleportSeat(((org.bukkit.craftbukkit.v1_19_R1.entity.CraftEntity) seat).getHandle(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
-        else if (getServerVersion().is1_19_R2()) teleportSeat(((org.bukkit.craftbukkit.v1_19_R2.entity.CraftEntity) seat).getHandle(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
-        else if (getServerVersion().is1_19_R3()) teleportSeat(((org.bukkit.craftbukkit.v1_19_R3.entity.CraftEntity) seat).getHandle(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
-        else if (getServerVersion().is1_20_R1()) teleportSeat(((org.bukkit.craftbukkit.v1_20_R1.entity.CraftEntity) seat).getHandle(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
-        else if (getServerVersion().is1_20_R2()) teleportSeat(((org.bukkit.craftbukkit.v1_20_R2.entity.CraftEntity) seat).getHandle(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
-        else if (getServerVersion().is1_20_R3()) teleportSeat(((org.bukkit.craftbukkit.v1_20_R3.entity.CraftEntity) seat).getHandle(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
-        else if (getServerVersion().is1_20_R4()) teleportSeat(((org.bukkit.craftbukkit.v1_20_R4.entity.CraftEntity) seat).getHandle(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
-        else if (getServerVersion().is1_21_R1()) teleportSeat(((org.bukkit.craftbukkit.v1_21_R1.entity.CraftEntity) seat).getHandle(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
-        else if (getServerVersion().is1_21_R2()) teleportSeat(((org.bukkit.craftbukkit.v1_21_R2.entity.CraftEntity) seat).getHandle(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
-        else if (getServerVersion().is1_21_R3()) teleportSeat(((org.bukkit.craftbukkit.v1_21_R3.entity.CraftEntity) seat).getHandle(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
-        else if (getServerVersion().is1_21_R4()) teleportSeat(((org.bukkit.craftbukkit.v1_21_R4.entity.CraftEntity) seat).getHandle(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
-        else if (getServerVersion().is1_21_R5()) teleportSeat(((org.bukkit.craftbukkit.v1_21_R5.entity.CraftEntity) seat).getHandle(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
-        else if (getServerVersion().is1_21_R6()) teleportSeat(((org.bukkit.craftbukkit.v1_21_R6.entity.CraftEntity) seat).getHandle(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
-    }
+        try {
+            ServerVersion version = getServerVersion();
+            String craftEntityClassName = "org.bukkit.craftbukkit." + version.name() + ".entity.CraftEntity";
+            if(version.isNewerOrEqualTo(ServerVersion.v26_1)) {
+                craftEntityClassName = "org.bukkit.craftbukkit.entity.CraftEntity";
+            }
+            Class<?> craftEntityClass = Class.forName(craftEntityClassName);
 
+            Method getHandleMethod = craftEntityClass.getMethod("getHandle");
+            Object handle = getHandleMethod.invoke(seat);
+            
+            teleportSeat(handle, loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
     /**
      * Get the String name of the method for teleporting an ArmorStand. Changes between versions.
      * @return Teleport method's name as String.
      */
     @VersionSpecific
     protected static String getTeleportMethod(){
-        if (getServerVersion().isNewerOrEqualTo(ServerVersion.v1_18_R1)) return "a";
+        if (getServerVersion().isNewerOrEqualTo(ServerVersion.v26_1)) return "absSnapTo";
+        else if (getServerVersion().isNewerOrEqualTo(ServerVersion.v1_18_R1)) return "a";
         else return "setLocation";
     }
 
     /**
      * Teleport a seat to a desired location. The seat must already be specified as a CraftBukkit Entity.
      * @param seat Seat's ArmorStand as a CraftBukkit Entity
-     * @param x X-coordinate of the locatoin
-     * @param y Y-coordinate of the locatoin
-     * @param z Z-coordinate of the locatoin
-     * @param yaw Yaw of the locatoin
-     * @param pitch Pitch of the locatoin
+     * @param x X-coordinate of the location
+     * @param y Y-coordinate of the location
+     * @param z Z-coordinate of the location
+     * @param yaw Yaw of the location
+     * @param pitch Pitch of the location
      */
     protected void teleportSeat(Object seat, double x, double y, double z, float yaw, float pitch){
         schedulerRun(() -> {
@@ -938,29 +932,36 @@ public class VehicleMovement {
      * @return True if player is jumping
      */
     protected boolean steerIsJumping(){
-        boolean isJumping = false;
         try {
-            if(getServerVersion().isOlderOrEqualTo(ServerVersion.v1_21_R1)){
-                
+            ServerVersion version = getServerVersion();
+            Class<?> packetClass = packet.getClass();
+
+            if (version.isOlderOrEqualTo(ServerVersion.v1_21_R1)) {
                 String declaredMethod = "d";
 
-                if (getServerVersion().isNewerOrEqualTo(ServerVersion.v1_20_R2) && getServerVersion().isOlderThan(ServerVersion.v1_20_R4))  {
+                if (version.isNewerOrEqualTo(ServerVersion.v1_20_R2) && version.isOlderThan(ServerVersion.v1_20_R4)) {
                     declaredMethod = "e";
-                } else if (getServerVersion().isNewerOrEqualTo(ServerVersion.v1_20_R4)) {
+                } else if (version.isNewerOrEqualTo(ServerVersion.v1_20_R4)) {
                     declaredMethod = "f";
                 }
-                Method method = packet.getClass().getDeclaredMethod(declaredMethod);
-                isJumping = (Boolean) method.invoke(packet);
-            } else { // 1_21_R2 and newer
-            Object input = packet.getClass().getDeclaredMethod("b").invoke(packet);
-            
-            isJumping = (boolean) input.getClass().getDeclaredMethod("e").invoke(input);
+                Method method = packetClass.getDeclaredMethod(declaredMethod);
+                return (Boolean) method.invoke(packet);
             }
-            
+
+            String inputMethod = "b";
+            String jumpMethod = "e";
+
+            if (version.isNewerOrEqualTo(ServerVersion.v26_1)) {
+                inputMethod = "input";
+                jumpMethod = "jump";
+            }
+
+            Object input = packetClass.getDeclaredMethod(inputMethod).invoke(packet);
+            return (boolean) input.getClass().getDeclaredMethod(jumpMethod).invoke(input);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return isJumping;
+        return false;
     }
 
     /**
@@ -968,29 +969,42 @@ public class VehicleMovement {
      * @return Rotation from the packet
      */
     protected float steerGetXxa(){
-        float Xxa = 0;
         try {
-            if(getServerVersion().isOlderOrEqualTo(ServerVersion.v1_21_R1)){
+            ServerVersion version = getServerVersion();
+            Class<?> packetClass = packet.getClass();
+
+            if (version.isOlderOrEqualTo(ServerVersion.v1_21_R1)) {
                 String declaredMethod = "b";
 
-                if (getServerVersion().isNewerOrEqualTo(ServerVersion.v1_19_R3) && getServerVersion().isOlderThan(ServerVersion.v1_20_R4)) {
+                if (version.isNewerOrEqualTo(ServerVersion.v1_19_R3) && version.isOlderThan(ServerVersion.v1_20_R4)) {
                     declaredMethod = "a";
                 }
 
-                Method method = packet.getClass().getDeclaredMethod(declaredMethod);
-                Xxa = (float) method.invoke(packet);
-            } else { // 1_21_R2 and newer
-                Object input = packet.getClass().getDeclaredMethod("b").invoke(packet);
-                if ((boolean) input.getClass().getDeclaredMethod("c").invoke(input)) {
-                    Xxa = 1;
-                } else if ((boolean) input.getClass().getDeclaredMethod("d").invoke(input)) {
-                    Xxa = -1;
-                }
+                Method method = packetClass.getDeclaredMethod(declaredMethod);
+                return (float) method.invoke(packet);
+            }
+
+            String inputMethod = "b";
+            String leftMethod = "c";
+            String rightMethod = "d";
+
+            if (version.isNewerOrEqualTo(ServerVersion.v26_1)) {
+                inputMethod = "input";
+                leftMethod = "left";
+                rightMethod = "right";
+            }
+
+            Object input = packetClass.getDeclaredMethod(inputMethod).invoke(packet);
+            if ((boolean) input.getClass().getDeclaredMethod(leftMethod).invoke(input)) {
+                return 1;
+            }
+            if ((boolean) input.getClass().getDeclaredMethod(rightMethod).invoke(input)) {
+                return -1;
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return Xxa;
+        return 0;
     }
 
     /**
@@ -998,31 +1012,44 @@ public class VehicleMovement {
      * @return Movement from the packet
      */
     protected float steerGetZza(){
-        float Zza = 0;
         try {
-            if(getServerVersion().isOlderOrEqualTo(ServerVersion.v1_21_R1)){
+            ServerVersion version = getServerVersion();
+            Class<?> packetClass = packet.getClass();
+
+            if (version.isOlderOrEqualTo(ServerVersion.v1_21_R1)) {
                 String declaredMethod = "c";
 
-                if (VersionModule.getServerVersion().isNewerOrEqualTo(ServerVersion.v1_20_R2) && getServerVersion().isOlderThan(ServerVersion.v1_20_R4)) {
+                if (version.isNewerOrEqualTo(ServerVersion.v1_20_R2) && version.isOlderThan(ServerVersion.v1_20_R4)) {
                     declaredMethod = "d";
-                } else if(getServerVersion().isNewerOrEqualTo(ServerVersion.v1_20_R4)){
+                } else if (version.isNewerOrEqualTo(ServerVersion.v1_20_R4)) {
                     declaredMethod = "e";
                 }
 
-                Method method = packet.getClass().getDeclaredMethod(declaredMethod);
-                Zza = (float) method.invoke(packet);
-            } else { // 1_21_R2 and newer
-                Object input = packet.getClass().getDeclaredMethod("b").invoke(packet);
-                if ((boolean) input.getClass().getDeclaredMethod("a").invoke(input)) {
-                    Zza = 1;
-                } else if ((boolean) input.getClass().getDeclaredMethod("b").invoke(input)) {
-                    Zza = -1;
-                }
+                Method method = packetClass.getDeclaredMethod(declaredMethod);
+                return (float) method.invoke(packet);
+            }
+
+            String inputMethod = "b";
+            String forwardMethod = "a";
+            String backwardMethod = "b";
+
+            if (version.isNewerOrEqualTo(ServerVersion.v26_1)) {
+                inputMethod = "input";
+                forwardMethod = "forward";
+                backwardMethod = "backward";
+            }
+
+            Object input = packetClass.getDeclaredMethod(inputMethod).invoke(packet);
+            if ((boolean) input.getClass().getDeclaredMethod(forwardMethod).invoke(input)) {
+                return 1;
+            }
+            if ((boolean) input.getClass().getDeclaredMethod(backwardMethod).invoke(input)) {
+                return -1;
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return Zza;
+        return 0;
     }
 
     /**
@@ -1035,7 +1062,7 @@ public class VehicleMovement {
         stand.getWorld().spawnParticle(Particle.EXPLOSION_LARGE, loc, 2);
         stand.getWorld().spawnParticle(Particle.EXPLOSION_NORMAL, loc, 2);
         stand.getWorld().spawnParticle(Particle.FIREWORKS_SPARK, loc, 5);
-        if (!getServerVersion().isOlderOrEqualTo(ServerVersion.v1_13))
+        if (!getServerVersion().isOlderOrEqualTo(ServerVersion.v1_13_R2))
             stand.getWorld().spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, loc, 5);
     }
 
@@ -1083,7 +1110,7 @@ public class VehicleMovement {
         Location loc = new Location(standMain.getWorld(), xvp, standMain.getLocation().getY() + yOffset, zvp, fbvp.getYaw(), fbvp.getPitch());
 
         if(loc.getBlock().getType().equals(Material.AIR)){
-            loc.getBlock().setType(Material.LIGHT);
+            loc.getBlock().setType(Material.getMaterial("LIGHT"));
             Bukkit.getScheduler().runTaskLater(instance, () -> loc.getBlock().setType(Material.AIR), 10L);
         }
     }
