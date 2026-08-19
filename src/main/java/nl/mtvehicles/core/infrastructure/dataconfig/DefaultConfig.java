@@ -362,7 +362,8 @@ public class DefaultConfig extends MTVConfig {
         REGION_ACTIONS_ENTER("regionActions.enter", "disabled"),
         REGION_ACTIONS_PICKUP("regionActions.pickup", "disabled"),
         REGION_ACTIONS_RIDE("regionActions.ride", "disabled"),
-        USE_PLAYER_FACING("usePlayerFacing", false);
+        USE_PLAYER_FACING("usePlayerFacing", false),
+        ITEM_SKIN_MODE("itemSkinMode", "dual");
 
         final private String path;
         final private Object defaultValue;

@@ -3,7 +3,6 @@ package nl.mtvehicles.core.infrastructure.utils;
 import de.tr7zw.changeme.nbtapi.NBTItem;
 import nl.mtvehicles.core.Main;
 import nl.mtvehicles.core.infrastructure.annotations.VersionSpecific;
-import nl.mtvehicles.core.infrastructure.enums.ServerVersion;
 
 import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
@@ -17,8 +16,6 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import static nl.mtvehicles.core.infrastructure.modules.VersionModule.getServerVersion;
 
 /**
  * Class for an easy creation of items
@@ -50,12 +47,7 @@ public class ItemFactory {
 
     @VersionSpecific
     public ItemFactory setDurability(int durability) {
-        if (getServerVersion() == ServerVersion.v1_12_R1) this.item.setDurability((short) durability);
-        else {
-            ItemMeta im = this.item.getItemMeta();
-            ((org.bukkit.inventory.meta.Damageable) im).setDamage(durability);
-            this.item.setItemMeta(im);
-        }
+        ItemSkinUtils.applySkinValue(this.item, durability);
         return this;
     }
 
