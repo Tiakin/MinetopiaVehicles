@@ -11,6 +11,7 @@ import nl.mtvehicles.core.infrastructure.dataconfig.VehicleDataConfig;
 import nl.mtvehicles.core.infrastructure.enums.InventoryTitle;
 import nl.mtvehicles.core.infrastructure.enums.Message;
 import nl.mtvehicles.core.infrastructure.enums.VehicleType;
+import nl.mtvehicles.core.infrastructure.utils.ItemSkinUtils;
 import nl.mtvehicles.core.infrastructure.utils.ItemUtils;
 import nl.mtvehicles.core.infrastructure.utils.LanguageUtils;
 import nl.mtvehicles.core.infrastructure.utils.MenuUtils;
@@ -223,7 +224,7 @@ public class InventoryClickListener extends MTVListener {
                     nbt.getString("mtvehicles.naam"),
                     VehicleType.valueOf((String) vehicles.get(intSave.get(player.getUniqueId())).get("vehicleType")),
                     false,
-                    vehicleMenu.get(player.getUniqueId()).getDurability(),
+                    ItemSkinUtils.getSkinValue(vehicleMenu.get(player.getUniqueId())),
                     vehicleMenu.get(player.getUniqueId()).getType().toString(),
                     false,
                     (boolean) vehicles.get(intSave.get(player.getUniqueId())).get("hornEnabled"),

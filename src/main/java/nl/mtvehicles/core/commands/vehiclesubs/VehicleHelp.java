@@ -24,6 +24,7 @@ public class VehicleHelp extends MTVSubCommand {
         sendMessage(String.format("&2/vehicle &aaddmember &f- &2%s", desc(Message.HELP_ADD_MEMBER)));
         sendMessage(String.format("&2/vehicle &aremoverider &f- &2%s", desc(Message.HELP_REMOVE_RIDER)));
         sendMessage(String.format("&2/vehicle &aremovemember &f- &2%s", desc(Message.HELP_REMOVE_MEMBER)));
+        sendMessage(String.format("&2/vehicle &atransfer &f- &2%s", desc(Message.HELP_TRANSFER)));
         sendMessage(String.format("&2/vehicle &abuy &f- &2%s", desc(Message.HELP_NEW_BUY)));
         if (sender.hasPermission("mtvehicles.admin")) {
             sendMessage("");
